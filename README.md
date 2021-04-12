@@ -12,6 +12,14 @@
 	- Company(Foreign)[nullable]
 	- Role(Foreign)
 
+### COMPANY
+	- Name
+	- Email
+	- Password
+	- VerificationStatus(Verifying Account)
+	- PasswordResetter
+	- CompanyProfile(Foreign)
+
 #### SUBSCRIPTIONS
 	- Id
 	- Name
@@ -22,7 +30,6 @@
 	- Id
 	- Organisation
 	- Location
-	- Grade
 	- ClosingDate
 	- Email
 	- Attachment
@@ -32,19 +39,28 @@
 	- Id
 	- CategoryName
 	- Description
+	- Verified
+
+### SUBCATEGORY
+	- Id
+	- SubCategoryName
+	- Verified
+	- categoryId(Foreign)
 
 #### JOBCATEGORY
 	- Id
 	- Job(Foreigh(JOB))
-	- Category(Foreign(CATEGORY))
+	- SubCategory(Foreign(SUBCATEGORY))
 
-#### COMPANY
+#### COMPANYPROFILE
 	- Id 
+	- VerifiedStatus(By an admin)
 	- Title
 	- Bio
 	- Location
 	- About
 	- Website
+	- Logo
 
 #### JOBCOMPANY
 	- Id
@@ -64,6 +80,7 @@
 	- About
 	- WebsiteLink
 	- CVlink
+	- ProfileImage
 
 
 #### ROLE
