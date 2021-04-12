@@ -7,6 +7,8 @@
 	- Name
 	- VerificationStatus
 	- UserType
+	- dateJoined
+	- lastLogin
 	- PasswordResetter
 	- Profile(Foreign)[nulluble]
 	- Company(Foreign)[nullable]
