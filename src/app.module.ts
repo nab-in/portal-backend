@@ -3,9 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { JobModule } from './modules/job/job.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot()],
+  // imported modules definition
+  imports: [JobModule, TypeOrmModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })
