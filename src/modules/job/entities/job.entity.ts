@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne , OneToMany, ManyToMany,JoinTable } from 'typeorm';
-
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Job {
@@ -7,26 +6,23 @@ export class Job {
   Id: number;
 
   @Column()
-  Name : string; 
+  Name: string;
 
   @Column()
-  Organisation : string; 
-
-
-  @Column()
-  Location : string; 
+  Organisation: string;
 
   @Column()
-  ClosingDate : Boolean; 
+  Location: string;
 
   @Column()
-  Email : string; 
+  ClosingDate: boolean;
 
   @Column()
-  Attachment : string; 
+  Email: string;
 
   @Column()
-  Description : string; 
+  Attachment: string;
 
-
+  @Column()
+  Description: string;
 }
