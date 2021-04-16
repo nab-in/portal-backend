@@ -1,26 +1,10 @@
-import {
-  BaseEntity,
-  BeforeInsert,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { generateUid } from '../../../../core/helpers/makeuid.helper';
+import { BeforeInsert, Column, Entity } from 'typeorm';
+import { NamedEntity } from '../../../../core/entities/named.entity';
 @Entity('user', { schema: 'public' })
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column('char', {
-    nullable: false,
-    length: 13,
-    name: 'uid',
-  })
-  uid: string;
-
+export class User extends NamedEntity {
   @Column('varchar', {
     nullable: true,
-    name: 'firstname',
+    name: 'name',
   })
   firstname: string;
 
@@ -56,7 +40,6 @@ export class User extends BaseEntity {
 
   @BeforeInsert()
   beforeUpdateTransaction() {
-    this.uid = generateUid();
     this.verified = false;
   }
 }
