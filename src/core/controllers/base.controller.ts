@@ -19,7 +19,6 @@ import { BaseService } from '../services/base.service';
 import { getPagerDetails } from '../utilities/get-pager-details.utility';
 import {
   deleteSuccessResponse,
-  entityExistResponse,
   genericFailureResponse,
   getSuccessResponse,
   postSuccessResponse,
@@ -70,26 +69,12 @@ export class BaseController<T extends PortalCoreEntity> {
   @Get(':id')
   async findOne(@Res() res: Response, @Param() params): Promise<ApiResult> {
     const results = await this.baseService.findOneByUid(params.id);
-
-    return getSuccessResponse(res, resolveResponse(results));
-  }
-
-  @Get(':id/:relation')
-  async findOneRelation(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Param() params,
-  ): Promise<ApiResult> {
-    try {
-      const isExist = await this.baseService.findOneByUid(params.id);
-      const getResponse = isExist;
-      if (isExist !== undefined) {
-        return { [params.relation]: getResponse[params.relation] };
-      } else {
-        return genericFailureResponse(res, params);
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    if (results) {
+      return getSuccessResponse(res, resolveResponse(results));
+    } else {
+      return res.status(HttpStatus.NOT_FOUND).send({
+        message: `Item with identifier ${params.id} could not be found`,
+      });
     }
   }
 
@@ -100,16 +85,11 @@ export class BaseController<T extends PortalCoreEntity> {
     @Body() createEntityDto,
   ): Promise<ApiResult> {
     try {
-      const isIDExist = await this.baseService.findOneByUid(createEntityDto.id);
-      if (isIDExist !== undefined) {
-        return entityExistResponse(res, isIDExist);
+      const createdEntity = await this.baseService.create(createEntityDto);
+      if (createdEntity !== undefined) {
+        return postSuccessResponse(res, resolveResponse(createdEntity));
       } else {
-        const createdEntity = await this.baseService.create(createEntityDto);
-        if (createdEntity !== undefined) {
-          return postSuccessResponse(res, resolveResponse(createdEntity));
-        } else {
-          return genericFailureResponse(res);
-        }
+        return genericFailureResponse(res);
       }
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -149,8 +129,8 @@ export class BaseController<T extends PortalCoreEntity> {
     @Res() res: Response,
   ): Promise<ApiResult> {
     try {
-      const isExist = await this.baseService.findOneByUid(params.id);
-      if (isExist !== undefined) {
+      const entity = await this.baseService.findOneByUid(params.id);
+      if (entity !== undefined) {
         const deleteResponse: DeleteResponse = await this.baseService.delete(
           params.id,
         );
