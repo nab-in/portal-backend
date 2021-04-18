@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { JobModule } from './modules/job/job.module';
+import { modules } from './modules/modules.export';
 
 @Module({
   // imported modules definition
-  imports: [JobModule, TypeOrmModule.forRoot()],
+  imports: [...modules, TypeOrmModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })

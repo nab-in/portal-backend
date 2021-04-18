@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JobDto } from '../DTO/JobDto';
 import { Job } from '../entities/job.entity';
