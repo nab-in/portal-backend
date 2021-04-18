@@ -1,5 +1,6 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
 import { Job } from 'src/modules/job/entities/job.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('user', { schema: 'public' })
@@ -50,8 +51,12 @@ export class Company extends NamedEntity {
   }
 
   @OneToMany(() => Job, (job) => job.company, {
-    eager: true,
     cascade: true,
   })
   jobs: Job[];
+
+  @OneToMany(() => User, (user) => user.company, {
+    cascade: true,
+  })
+  users: User[];
 }

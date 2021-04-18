@@ -1,5 +1,13 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { Company } from 'src/modules/company/entities/company.entity';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
@@ -40,6 +48,10 @@ export class User extends NamedEntity {
     name: 'verified',
   })
   verified: boolean;
+
+  @ManyToOne(() => Company, (company) => company.users)
+  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
+  company: Company;
 
   @BeforeInsert()
   beforeUpdateTransaction() {
