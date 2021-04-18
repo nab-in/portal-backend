@@ -11,7 +11,9 @@ export const resolveResponse: any = (responseObject: any) => {
   const newResponseObject = {
     id: responseObject.uid,
   };
-  const attributeKeys = Object.keys(omit(responseObject, ['id', 'uid']));
+  const attributeKeys = Object.keys(
+    omit(responseObject, ['id', 'uid', 'password']),
+  );
   attributeKeys.forEach((attributeKey) => {
     let attributeValue: string | boolean | number | any;
     if (responseObject[attributeKey] === false) {
