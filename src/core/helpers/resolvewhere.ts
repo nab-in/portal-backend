@@ -1,4 +1,4 @@
-import { entityDatabaseMapping } from '../resolvers/database-table.resolver';
+import { entityDatabaseMapping } from '../resolvers/entity-database.mapping.resolver';
 
 export async function resolveWhere(
   modelRepository: any,

@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import _ from 'lodash';
 import { FindConditions, Repository, UpdateResult } from 'typeorm';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { getRelations, getSelections } from '../helpers/get-fields.utility';
 import { getWhereConditions } from '../helpers/get-where-conditions.utility';
+import { resolvedResponse } from '../helpers/resolve.payload';
 import { resolveWhere } from '../helpers/resolvewhere';
-import { UIDToIDResolver } from '../helpers/uid-to-id.resolver';
-import { entityDatabaseMapping } from '../resolvers/database-table.resolver';
 
 @Injectable()
 export class BaseService<T extends PortalCoreEntity> {
@@ -23,48 +21,10 @@ export class BaseService<T extends PortalCoreEntity> {
   async findWhere(where: FindConditions<T>): Promise<T[]> {
     return await this.modelRepository.find({ where });
   }
-
-  async findIn(inConditions: { [attributeName: string]: string[] }) {
-    const sanitizedConditions = _.flatten(
-      _.keys(inConditions || []).map((conditionKey) => {
-        return (inConditions[conditionKey] || []).map((conditionValue) => {
-          return { [conditionKey]: conditionValue };
-        });
-      }),
-    );
-
-    const metaData = this.modelRepository.manager.connection.getMetadata(
-      this.Model,
-    );
-
-    const relations = (metaData.relations || [])
-      .map((relation) => {
-        return relation.relationType === 'many-to-one'
-          ? relation.propertyName
-          : undefined;
-      })
-      .filter((propertyName) => propertyName);
-
-    return await this.modelRepository.find({
-      where: sanitizedConditions,
-      relations,
-    });
-  }
   async findAndCount(fields, filter, size, page): Promise<[T[], number]> {
     const metaData = this.modelRepository.manager.connection.getMetadata(
       this.Model,
     );
-
-    let join: any = {};
-
-    if (metaData.tableName === 'organisationunit') {
-      join = {
-        alias: 'organisationunit',
-        leftJoinAndSelect: {
-          profile: 'organisationunit.parent',
-        },
-      };
-    }
     const conditions = await resolveWhere(
       this.modelRepository,
       getWhereConditions(filter),
@@ -72,7 +32,6 @@ export class BaseService<T extends PortalCoreEntity> {
     return await this.modelRepository.findAndCount({
       select: getSelections(fields, metaData),
       relations: getRelations(fields, metaData),
-      join,
       where: conditions,
       skip: page * size,
       take: size,
@@ -148,53 +107,13 @@ export class BaseService<T extends PortalCoreEntity> {
       return this.modelRepository.delete(condition);
     }
   }
-  async EntityUidResolver(entityUpdates: any, entity: any) {
+  async EntityUidResolver(entityUpdates: any) {
     if (entityUpdates) {
-      const id = entity.id;
-      entity = { ...entity, id: entity.id };
-      const objectKeys = Object.keys(entityUpdates);
-      const relationUIDs = await Promise.all(
-        _.map(
-          objectKeys,
-          async (key: string): Promise<any> => {
-            if (_.isArray(entityUpdates[key])) {
-              const result = await this.getRelationUids(entityUpdates, key);
-              entity[key] = [
-                ...entity[key],
-                ...(await this.getRelationUids(entityUpdates, key)),
-              ];
-              if (result) {
-                return await this.getRelationUids(entityUpdates, key);
-              }
-            } else {
-              if (_.has(entityUpdates, key) && _.has(entity, key)) {
-                entity[key] = entityUpdates[key];
-              }
-            }
-          },
-        ),
-      );
-      entity.id = id;
-      return _.flatten(
-        _.filter(relationUIDs, (uid) => uid === 0 || Boolean(uid)),
-      ).length >= 1
-        ? entity
-        : entity;
+      const updated = await resolvedResponse({
+        payload: entityUpdates,
+        repository: this.modelRepository,
+      });
+      return updated;
     }
-  }
-  async getRelationUids(entityRelationProps: any[], key: string): Promise<any> {
-    return Promise.all(
-      _.map(
-        entityRelationProps[key],
-        async (relationObj: any): Promise<any> => {
-          const relationUids = await UIDToIDResolver(
-            relationObj.uid,
-            this.modelRepository,
-            entityDatabaseMapping[key],
-          );
-          return await relationUids;
-        },
-      ),
-    );
   }
 }

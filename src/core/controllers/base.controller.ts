@@ -105,16 +105,17 @@ export class BaseController<T extends PortalCoreEntity> {
   ): Promise<ApiResult> {
     const updateEntity = await this.baseService.findOneByUid(params.id);
     if (updateEntity !== undefined) {
+      updateEntityDto['id'] = updateEntity['id'];
       const resolvedEntityDTO: any = await this.baseService.EntityUidResolver(
         updateEntityDto,
-        updateEntity,
       );
-
       const payload = await this.baseService.update(resolvedEntityDTO);
       if (payload) {
-        return res
-          .status(res.statusCode)
-          .json({ message: `Item with id ${params.id} updated successfully.` });
+        const data = await this.baseService.findOneByUid(params.id);
+        return res.status(res.statusCode).json({
+          message: `Item with id ${params.id} updated successfully.`,
+          payload: resolveResponse(data),
+        });
       }
     } else {
       return genericFailureResponse(res, params);

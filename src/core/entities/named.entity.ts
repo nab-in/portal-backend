@@ -1,10 +1,4 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { generateUid } from '../helpers/makeuid.helper';
+import { Column, PrimaryGeneratedColumn } from 'typeorm';
 import { PortalCoreEntity } from './portal.core.entity';
 
 export class NamedEntity extends PortalCoreEntity {
@@ -36,16 +30,4 @@ export class NamedEntity extends PortalCoreEntity {
     name: 'lastupdated',
   })
   lastupdated: Date | null;
-
-  @BeforeInsert()
-  beforeUpdateTransaction() {
-    this.created = new Date();
-    this.lastupdated = new Date();
-    this.uid = generateUid();
-  }
-
-  @BeforeUpdate()
-  beforeUpdating() {
-    this.lastupdated = new Date();
-  }
 }

@@ -1,5 +1,5 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
@@ -44,7 +44,14 @@ export class User extends NamedEntity {
   @BeforeInsert()
   beforeUpdateTransaction() {
     this.verified = false;
+    this.created = new Date();
+    this.lastupdated = new Date();
     this.uid = generateUid();
+  }
+
+  @BeforeUpdate()
+  beforeUpdating() {
+    this.lastupdated = new Date();
   }
 }
 

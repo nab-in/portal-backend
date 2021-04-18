@@ -1,5 +1,5 @@
 import { EntityMetadata } from 'typeorm';
-import { entityDatabaseMapping } from '../resolvers/database-table.resolver';
+import { entityDatabaseMapping } from '../resolvers/entity-database.mapping.resolver';
 export function getSelections(fields: any, metaData: EntityMetadata): any {
   if (fields) {
     fields = fields.split('*').join(
