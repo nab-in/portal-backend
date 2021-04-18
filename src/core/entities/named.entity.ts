@@ -1,13 +1,13 @@
 import {
-  BaseEntity,
   BeforeInsert,
   BeforeUpdate,
   Column,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { generateUid } from '../helpers/makeuid.helper';
+import { PortalCoreEntity } from './portal.core.entity';
 
-export class NamedEntity extends BaseEntity {
+export class NamedEntity extends PortalCoreEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
