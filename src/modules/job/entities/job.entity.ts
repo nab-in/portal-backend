@@ -1,7 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { NamedEntity } from 'src/core/entities/named.entity';
+import { Company } from 'src/modules/company/entities/company.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
-export class Job {
+export class Job extends NamedEntity {
   @PrimaryGeneratedColumn()
   Id: number;
 
@@ -25,4 +33,7 @@ export class Job {
 
   @Column()
   Description: string;
+  @ManyToOne(() => Company, (company) => company.jobs)
+  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
+  company: Company;
 }
