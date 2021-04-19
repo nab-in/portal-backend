@@ -20,7 +20,7 @@ export class NamedEntity extends PortalCoreEntity {
 
   @Column('timestamp without time zone', {
     nullable: true,
-    name: 'datecreated',
+    name: 'created',
   })
   created: Date;
 

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { generate } from 'rxjs';
+import { generateUid } from 'src/core/helpers/makeuid.helper';
 import { JobDto } from '../DTO/JobDto';
 import { Job } from '../entities/job.entity';
 
@@ -35,16 +37,17 @@ export class JobService {
       Email: 'nabin@nabinLab.com',
       Attachment: 'path/to/fle.pdf',
       Description: 'We need a teenage developer with 30yrs experience',
+      comapny: { id: generateUid() },
     },
   ];
 
-  async getall(): Promise<Job[]> {
-    return await this.sample;
+  /*async getall(): Promise<Job[]> {
+    return this.sample;
   }
 
   async getOne(id: number): Promise<Job> {
     return this.sample[id - 1];
-  }
+  }*/
 
   async add(body: any): Promise<any> {}
 

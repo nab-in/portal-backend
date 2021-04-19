@@ -3,7 +3,7 @@ import { Job } from 'src/modules/job/entities/job.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
-@Entity('user', { schema: 'public' })
+@Entity('company', { schema: 'public' })
 export class Company extends NamedEntity {
   static plural = 'companies';
 
@@ -32,11 +32,21 @@ export class Company extends NamedEntity {
   })
   title: string;
 
-  @Column('boolean', {
-    nullable: false,
+  @Column('varchar', {
+    nullable: true,
     name: 'about',
   })
   about: string;
+
+  @OneToMany(() => Job, (job) => job.company, {
+    cascade: true,
+  })
+  jobs: Job[];
+
+  @OneToMany(() => User, (users) => users.company, {
+    cascade: true,
+  })
+  users: User[];
 
   @BeforeInsert()
   beforeUpdateTransaction() {
@@ -49,14 +59,4 @@ export class Company extends NamedEntity {
   beforeUpdating() {
     this.lastupdated = new Date();
   }
-
-  @OneToMany(() => Job, (job) => job.company, {
-    cascade: true,
-  })
-  jobs: Job[];
-
-  @OneToMany(() => User, (user) => user.company, {
-    cascade: true,
-  })
-  users: User[];
 }

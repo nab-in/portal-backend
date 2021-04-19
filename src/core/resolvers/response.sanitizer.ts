@@ -24,7 +24,7 @@ export const resolveResponse: any = (responseObject: any) => {
     if (attributeValue || attributeValue === false) {
       if (typeof attributeValue === 'object') {
         if (Array.isArray(attributeValue)) {
-          newResponseObject[attributeKey] = resolveResponse.map(
+          newResponseObject[attributeKey] = responseObject[attributeKey].map(
             (value: any) => value === resolveResponse(attributeValue),
           );
         } else {

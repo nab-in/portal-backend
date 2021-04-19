@@ -1,13 +1,11 @@
 import {
+  Body,
   Controller,
-  Get,
+  Delete,
+  Headers,
+  Param,
   Post,
   Put,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-  Headers,
 } from '@nestjs/common';
 import { JobDto } from '../DTO/JobDto';
 import { Job } from '../entities/job.entity';
@@ -19,7 +17,7 @@ export class JobController {
   constructor(private readonly JobsService: JobService) {}
 
   // get all the jobs
-  @Get()
+  /* @Get()
   getall(): Promise<Job[]> {
     return this.JobsService.getall();
   }
@@ -29,7 +27,7 @@ export class JobController {
   getOne(@Param('id') id): Promise<Job> {
     return this.JobsService.getOne(id);
   }
-
+*/
   // add jobs
 
   @Post()

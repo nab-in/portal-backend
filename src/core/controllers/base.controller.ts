@@ -67,8 +67,15 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
-  async findOne(@Res() res: Response, @Param() params): Promise<ApiResult> {
-    const results = await this.baseService.findOneByUid(params.id);
+  async findOne(
+    @Res() res: Response,
+    @Param() params,
+    @Query() query,
+  ): Promise<ApiResult> {
+    const results = await this.baseService.findOneByUid(
+      params.id,
+      query.fields,
+    );
     if (results) {
       return getSuccessResponse(res, resolveResponse(results));
     } else {
@@ -85,7 +92,10 @@ export class BaseController<T extends PortalCoreEntity> {
     @Body() createEntityDto,
   ): Promise<ApiResult> {
     try {
-      const createdEntity = await this.baseService.create(createEntityDto);
+      const resolvedEntity = await this.baseService.EntityUidResolver(
+        createEntityDto,
+      );
+      const createdEntity = await this.baseService.create(resolvedEntity);
       if (createdEntity !== undefined) {
         return postSuccessResponse(res, resolveResponse(createdEntity));
       } else {

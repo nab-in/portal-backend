@@ -38,8 +38,15 @@ export class BaseService<T extends PortalCoreEntity> {
     });
   }
 
-  async findOneByUid(uid: string): Promise<T> {
-    return await this.modelRepository.findOne({ where: { uid } });
+  async findOneByUid(uid: string, fields?: any): Promise<T> {
+    const metaData = this.modelRepository.manager.connection.getMetadata(
+      this.Model,
+    );
+    return await this.modelRepository.findOne({
+      where: { uid },
+      select: getSelections(fields, metaData),
+      relations: getRelations(fields, metaData),
+    });
   }
   async findOneById(id: any): Promise<T> {
     return await this.modelRepository.findOne({ where: { id } });
@@ -86,7 +93,11 @@ export class BaseService<T extends PortalCoreEntity> {
     Object.keys(entity).forEach((key) => {
       model[key] = entity[key];
     });
-    return await this.modelRepository.save(model);
+    await this.modelRepository.save(model);
+    const savedEntity = await this.modelRepository.findOne({
+      where: { uid: model.uid },
+    });
+    return savedEntity;
   }
   async updateByUID(uid: string, model: any): Promise<UpdateResult> {
     const condition: any = { uid };
