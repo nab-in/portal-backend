@@ -66,11 +66,3 @@ export class User extends NamedEntity {
     this.lastupdated = new Date();
   }
 }
-
-/*
-- UserType
-- PasswordResetter
-- Profile(Foreign)[nulluble]
-- Company(Foreign)[nullable]
-- Role(Foreign)
-*/

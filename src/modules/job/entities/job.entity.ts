@@ -1,39 +1,47 @@
-import { NamedEntity } from 'src/core/entities/named.entity';
-import { Company } from 'src/modules/company/entities/company.entity';
+import { NamedEntity } from '../../../core/entities/named.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { Company } from '../../company/entities/company.entity';
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import { Review } from '../../review/entities/review.entity';
 
 @Entity()
 export class Job extends NamedEntity {
-  @PrimaryGeneratedColumn()
-  Id: number;
+  @Column('varchar', { name: 'descriptio', nullable: true })
+  description: string;
 
-  @Column()
-  Name: string;
+  @Column('varchar', { name: 'location', nullable: true })
+  location: string;
 
-  @Column()
-  Organisation: string;
+  @Column('varchar', { name: 'closedate', nullable: true })
+  closeDate: string;
 
-  @Column()
-  Location: string;
+  @Column('varchar', { name: 'attachment', nullable: true })
+  attachment: string;
 
-  @Column()
-  ClosingDate: boolean;
-
-  @Column()
-  Email: string;
-
-  @Column()
-  Attachment: string;
-
-  @Column()
-  Description: string;
   @ManyToOne(() => Company, (company) => company.jobs)
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
+
+  @OneToMany(() => Review, (review) => review.job)
+  reviews: Review[];
+
+  @BeforeInsert()
+  beforeUpdateTransaction() {
+    this.created = new Date();
+    this.lastupdated = new Date();
+    this.uid = generateUid();
+  }
+
+  @BeforeUpdate()
+  beforeUpdating() {
+    this.lastupdated = new Date();
+  }
 }

@@ -1,9 +1,9 @@
 import { BeforeInsert, BeforeUpdate, Entity } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
-@Entity('userrole', { schema: 'public' })
-export class UserRole extends NamedEntity {
-  static plural = 'userRoles';
+
+@Entity()
+export class JobCategory extends NamedEntity {
   @BeforeInsert()
   beforeUpdateTransaction() {
     this.created = new Date();
