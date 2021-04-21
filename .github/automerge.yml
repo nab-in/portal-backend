@@ -26,7 +26,7 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.PORTAL_TOKEN }}'
 env:
-  GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+  GITHUB_TOKEN: '${{ secrets.PORTAL_TOKEN }}'
   MERGE_LABELS: 'automerge,!work in progress'
   MERGE_REMOVE_LABELS: 'automerge'
   MERGE_METHOD: 'squash'
