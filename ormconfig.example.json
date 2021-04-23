@@ -1,19 +1,19 @@
 {
-  "type": "<RDBMS type>",
-  "host": "<HOST>",
-  "port": "<PORT>",
-  "username": "<RDBMS USERNAME>",
-  "password": "<RDBMS PASSOWRD>",
-  "database": "DB NAME",
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "postgres",
+  "password": "postgres",
+  "database": "portal",
   "synchronize": true,
-  "logging": true,
+  "logging": false,
   "dropSchema": true,
-  "entities": ["src/modules/**/*.entityentity{.ts,.js}"],
-  "migrations": ["src/database/migration/**/*.ts"],
+  "entities": ["dist/modules/**/entities/*.entity.js"],
+  "migrations": ["dist/database/migrations/**/*.js"],
   "subscribers": ["src/subscriber/**/*.ts"],
   "cli": {
     "entitiesDir": "src/modules/entities",
-    "migrationsDir": "src/database/migration",
+    "migrationsDir": "src/database/migrations",
     "subscribersDir": "src/subscriber"
   }
 }
