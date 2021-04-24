@@ -5,10 +5,8 @@ import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  //   constructor() {}
   async login(username: any, password: any): Promise<User> {
     const user: User = await User.findOne({ where: { username } });
-    console.log('USER', user);
     const hashedPassword = await passwordCompare(password, user.password);
     if (hashedPassword) {
       delete user.password;

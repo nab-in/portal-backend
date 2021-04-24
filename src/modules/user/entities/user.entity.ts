@@ -83,7 +83,6 @@ export class User extends NamedEntity {
     const user: User = await User.findOne({
       where: { username },
     });
-    console.log('USER:::', user);
     if (user && (await passwordCompare(password, user.password))) {
       delete user.password;
       return user;
