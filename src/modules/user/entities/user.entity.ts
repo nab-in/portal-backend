@@ -1,4 +1,5 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
+import { passwordHash } from 'src/core/utilities/password.hash';
 import { Company } from 'src/modules/company/entities/company.entity';
 import {
   BeforeInsert,
@@ -54,15 +55,19 @@ export class User extends NamedEntity {
   company: Company;
 
   @BeforeInsert()
-  beforeUpdateTransaction() {
+  async beforeUpdateTransaction() {
     this.verified = false;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
+    this.password = await passwordHash(this.password);
   }
 
   @BeforeUpdate()
-  beforeUpdating() {
+  async beforeUpdating() {
     this.lastupdated = new Date();
+    if (this.password) {
+      this.password = await passwordHash(this.password);
+    }
   }
 }
