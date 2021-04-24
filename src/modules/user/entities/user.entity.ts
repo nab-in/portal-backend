@@ -1,6 +1,9 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { passwordHash } from 'src/core/utilities/password.hash';
-import { Company } from 'src/modules/company/entities/company.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import {
+  passwordCompare,
+  passwordHash,
+} from '../../../core/utilities/password.hash';
+import { Company } from '../../company/entities/company.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -50,6 +53,12 @@ export class User extends NamedEntity {
   })
   verified: boolean;
 
+  @Column('boolean', {
+    nullable: false,
+    name: 'enabled',
+  })
+  enabled: boolean;
+
   @ManyToOne(() => Company, (company) => company.users)
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
@@ -68,6 +77,18 @@ export class User extends NamedEntity {
     this.lastupdated = new Date();
     if (this.password) {
       this.password = await passwordHash(this.password);
+    }
+  }
+  public static async verifyUser(username: any, password: any): Promise<User> {
+    const user: User = await User.findOne({
+      where: { username },
+    });
+    console.log('USER:::', user);
+    if (user && (await passwordCompare(password, user.password))) {
+      delete user.password;
+      return user;
+    } else {
+      return null;
     }
   }
 }

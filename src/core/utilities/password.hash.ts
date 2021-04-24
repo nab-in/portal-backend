@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 
-export const passwordHash = (password: any): Promise<string> => {
+export const passwordHash = (password: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     bcrypt.hash(
       password,
@@ -16,7 +16,10 @@ export const passwordHash = (password: any): Promise<string> => {
   });
 };
 
-export const passwordCompare = (password: any, hash: any): Promise<boolean> => {
+export const passwordCompare = (
+  password: any,
+  hash: string,
+): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     bcrypt.compare(
       password,
