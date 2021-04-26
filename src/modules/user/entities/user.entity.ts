@@ -66,6 +66,7 @@ export class User extends NamedEntity {
   @BeforeInsert()
   async beforeUpdateTransaction() {
     this.verified = false;
+    this.enabled = true;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
