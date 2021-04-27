@@ -1,18 +1,21 @@
-import { generateUid } from '../../../core/helpers/makeuid.helper';
-import {
-  passwordCompare,
-  passwordHash,
-} from '../../../core/utilities/password.hash';
-import { Company } from '../../company/entities/company.entity';
+import { Job } from 'src/modules/job/entities/job.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import {
+  passwordCompare,
+  passwordHash,
+} from '../../../core/utilities/password.hash';
+import { Company } from '../../company/entities/company.entity';
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
   static plural = 'users';
@@ -62,6 +65,10 @@ export class User extends NamedEntity {
   @ManyToOne(() => Company, (company) => company.users)
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
+
+  @ManyToMany(() => Job)
+  @JoinTable({ name: 'userjobs' })
+  jobs: Job[];
 
   @BeforeInsert()
   async beforeUpdateTransaction() {
