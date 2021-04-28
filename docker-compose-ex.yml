@@ -17,10 +17,8 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
   api:
-    image: hris/api
+    image: portal/api
     build: .
-    environment:
-      - HRIS_HOME=/home/app/files
     restart: always
     depends_on:
       - db
@@ -28,7 +26,6 @@ services:
     command: npm run start:dev
     volumes:
       - ./src:/home/app/src
-      - ./files:/home/app/files
       - ./dist:/home/app/dist
 volumes:
   postdb-data:
