@@ -1,10 +1,10 @@
 import { Body, Controller, Post, Req, Res } from '@nestjs/common';
-import { BaseController } from 'src/core/controllers/base.controller';
-import { resolveResponse } from 'src/core/resolvers/response.sanitizer';
+import { BaseController } from '../../../core/controllers/base.controller';
+import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import {
   genericFailureResponse,
   postSuccessResponse,
-} from 'src/core/utilities/response.helper';
+} from '../../../core/utilities/response.helper';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 
