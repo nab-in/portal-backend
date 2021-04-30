@@ -50,6 +50,18 @@ export class User extends NamedEntity {
   })
   password: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'cv',
+  })
+  cv: string;
+
+  @Column('varchar', {
+    nullable: false,
+    name: 'dp',
+  })
+  dp: string;
+
   @Column('boolean', {
     nullable: false,
     name: 'verified',
