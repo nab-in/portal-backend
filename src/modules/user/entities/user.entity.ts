@@ -57,7 +57,7 @@ export class User extends NamedEntity {
   cv: string;
 
   @Column('varchar', {
-    nullable: false,
+    nullable: true,
     name: 'dp',
   })
   dp: string;
