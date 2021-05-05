@@ -1,5 +1,10 @@
-import { Controller } from '@nestjs/common';
-import { BaseController } from 'src/core/controllers/base.controller';
+import { Controller, Param, Post, Req, Res } from '@nestjs/common';
+import { BaseController } from '../../../core/controllers/base.controller';
+import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
+import {
+  genericFailureResponse,
+  postSuccessResponse,
+} from '../../../core/utilities/response.helper';
 import { Job } from '../entities/job.entity';
 import { JobService } from '../services/job.service';
 
@@ -7,5 +12,28 @@ import { JobService } from '../services/job.service';
 export class JobController extends BaseController<Job> {
   constructor(private service: JobService) {
     super(service, Job);
+  }
+  @Post(':job/apply')
+  async apply(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() param: any,
+  ): Promise<any> {
+    try {
+      let user = req.session.user;
+      const jobs = [{ id: param.job }];
+      user = { ...user, jobs };
+      const resolvedEntity = await this.service.EntityUidResolver(user);
+      const userJobs = await this.service.findUserJobs(user.id);
+      resolvedEntity.jobs = resolvedEntity.jobs.push(userJobs);
+      const createdEntity = await this.service.update(resolvedEntity);
+      if (createdEntity !== undefined) {
+        return postSuccessResponse(res, resolveResponse(createdEntity));
+      } else {
+        return genericFailureResponse(res);
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
 }

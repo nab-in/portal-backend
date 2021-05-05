@@ -1,14 +1,21 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { Company } from 'src/modules/company/entities/company.entity';
+import { Job } from 'src/modules/job/entities/job.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import {
+  passwordCompare,
+  passwordHash,
+} from '../../../core/utilities/password.hash';
+import { Company } from '../../company/entities/company.entity';
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
   static plural = 'users';
@@ -43,26 +50,64 @@ export class User extends NamedEntity {
   })
   password: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'cv',
+  })
+  cv: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'dp',
+  })
+  dp: string;
+
   @Column('boolean', {
     nullable: false,
     name: 'verified',
   })
   verified: boolean;
 
+  @Column('boolean', {
+    nullable: false,
+    name: 'enabled',
+  })
+  enabled: boolean;
+
   @ManyToOne(() => Company, (company) => company.users)
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
 
+  @ManyToMany(() => Job)
+  @JoinTable({ name: 'userjobs' })
+  jobs: Job[];
+
   @BeforeInsert()
-  beforeUpdateTransaction() {
+  async beforeUpdateTransaction() {
     this.verified = false;
+    this.enabled = true;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
+    this.password = await passwordHash(this.password);
   }
 
   @BeforeUpdate()
-  beforeUpdating() {
+  async beforeUpdating() {
     this.lastupdated = new Date();
+    if (this.password) {
+      this.password = await passwordHash(this.password);
+    }
+  }
+  public static async verifyUser(username: any, password: any): Promise<User> {
+    const user: User = await User.findOne({
+      where: { username },
+    });
+    if (user && (await passwordCompare(password, user.password))) {
+      delete user.password;
+      return user;
+    } else {
+      return null;
+    }
   }
 }

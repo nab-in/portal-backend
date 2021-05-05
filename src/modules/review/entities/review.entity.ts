@@ -10,7 +10,7 @@ import {
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('Review', { schema: 'public' })
 export class Review extends NamedEntity {
-  static plural = 'companies';
+  static plural = 'reviews';
 
   @OneToMany(() => Job, (job) => job.reviews, {
     cascade: true,

@@ -1,6 +1,3 @@
-import { NamedEntity } from '../../../core/entities/named.entity';
-import { generateUid } from '../../../core/helpers/makeuid.helper';
-import { Company } from '../../company/entities/company.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -10,10 +7,14 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { NamedEntity } from '../../../core/entities/named.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { Company } from '../../company/entities/company.entity';
 import { Review } from '../../review/entities/review.entity';
 
 @Entity()
 export class Job extends NamedEntity {
+  static plural = 'jobs';
   @Column('varchar', { name: 'descriptio', nullable: true })
   description: string;
 

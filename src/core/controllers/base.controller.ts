@@ -9,8 +9,10 @@ import {
   Query,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { SessionGuard } from '../../modules/user/guards/session.guard';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { ApiResult } from '../interfaces/api-result.interface';
 import { DeleteResponse } from '../interfaces/response/delete.interface';
@@ -31,6 +33,7 @@ export class BaseController<T extends PortalCoreEntity> {
   ) {}
 
   @Get()
+  @UseGuards(SessionGuard)
   async findAll(@Query() query): Promise<ApiResult> {
     if (query.paging === 'false') {
       const allContents: T[] = await this.baseService.findAll();
@@ -67,6 +70,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
+  @UseGuards(SessionGuard)
   async findOne(
     @Res() res: Response,
     @Param() params,
@@ -86,6 +90,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Post()
+  @UseGuards(SessionGuard)
   async create(
     @Req() req: Request,
     @Res() res: Response,
@@ -107,6 +112,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Put(':id')
+  @UseGuards(SessionGuard)
   async update(
     @Req() req: Request,
     @Res() res: Response,
@@ -134,6 +140,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Delete(':id')
+  @UseGuards(SessionGuard)
   async delete(
     @Param() params,
     @Req() req: Request,
