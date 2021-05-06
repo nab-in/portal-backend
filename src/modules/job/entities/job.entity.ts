@@ -12,7 +12,7 @@ import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
 import { Review } from '../../review/entities/review.entity';
 
-@Entity()
+@Entity('job', { schema: 'public' })
 export class Job extends NamedEntity {
   static plural = 'jobs';
   @Column('varchar', { name: 'descriptio', nullable: true })
