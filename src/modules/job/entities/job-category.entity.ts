@@ -4,6 +4,7 @@ import { generateUid } from '../../../core/helpers/makeuid.helper';
 
 @Entity()
 export class JobCategory extends NamedEntity {
+  static plural = 'jobCategories';
   @BeforeInsert()
   beforeUpdateTransaction() {
     this.created = new Date();
