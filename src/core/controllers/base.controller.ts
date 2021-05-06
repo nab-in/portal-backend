@@ -33,7 +33,6 @@ export class BaseController<T extends PortalCoreEntity> {
   ) {}
 
   @Get()
-  @UseGuards(SessionGuard)
   async findAll(@Query() query): Promise<ApiResult> {
     if (query.paging === 'false') {
       const allContents: T[] = await this.baseService.findAll();
@@ -70,7 +69,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
-  @UseGuards(SessionGuard)
   async findOne(
     @Res() res: Response,
     @Param() params,
