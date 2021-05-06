@@ -29,6 +29,7 @@ export class User extends NamedEntity {
   @Column('varchar', {
     nullable: true,
     name: 'email',
+    unique: true,
   })
   email: string;
 
@@ -41,6 +42,7 @@ export class User extends NamedEntity {
   @Column('varchar', {
     nullable: false,
     name: 'username',
+    unique: true,
   })
   username: string;
 
