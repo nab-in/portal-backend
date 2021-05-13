@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate {
     const request = httpContext.getRequest();
     try {
       const user = await User.verifyUser(
-        request.body.username,
+        request.body.username || request.body.email,
         request.body.password,
       );
       if (user) {
