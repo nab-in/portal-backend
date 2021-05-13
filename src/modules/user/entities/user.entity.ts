@@ -102,9 +102,18 @@ export class User extends NamedEntity {
     }
   }
   public static async verifyUser(username: any, password: any): Promise<User> {
-    const user: User = await User.findOne({
-      where: { username },
-    });
+    let user: User;
+    const email = /^\S+@\S+$/;
+    const isEmail = email.test(username);
+    if (isEmail) {
+      user = await User.findOne({
+        where: { email: username },
+      });
+    } else {
+      user = await User.findOne({
+        where: { username },
+      });
+    }
     if (user && (await passwordCompare(password, user.password))) {
       delete user.password;
       return user;
