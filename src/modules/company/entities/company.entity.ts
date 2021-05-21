@@ -23,6 +23,7 @@ export class Company extends NamedEntity {
   @Column('varchar', {
     nullable: false,
     name: 'website',
+    unique: true,
   })
   website: string;
 
@@ -35,6 +36,7 @@ export class Company extends NamedEntity {
   @Column('varchar', {
     nullable: true,
     name: 'about',
+    unique: true,
   })
   about: string;
 

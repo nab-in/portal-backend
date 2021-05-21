@@ -9,11 +9,13 @@ import {
   Query,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { SessionGuard } from '../../modules/user/guards/session.guard';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
+import { QueryErrorFilter } from '../interceptors/error.filter';
 import { ApiResult } from '../interfaces/api-result.interface';
 import { DeleteResponse } from '../interfaces/response/delete.interface';
 import { resolveResponse } from '../resolvers/response.sanitizer';
@@ -89,24 +91,25 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Post()
   @UseGuards(SessionGuard)
+  @UseFilters(new QueryErrorFilter())
   async create(
     @Req() req: Request,
     @Res() res: Response,
     @Body() createEntityDto,
   ): Promise<ApiResult> {
-    try {
-      const resolvedEntity = await this.baseService.EntityUidResolver(
-        createEntityDto,
-      );
-      const createdEntity = await this.baseService.create(resolvedEntity);
-      if (createdEntity !== undefined) {
-        return postSuccessResponse(res, resolveResponse(createdEntity));
-      } else {
-        return genericFailureResponse(res);
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    // try {
+    const resolvedEntity = await this.baseService.EntityUidResolver(
+      createEntityDto,
+    );
+    const createdEntity = await this.baseService.create(resolvedEntity);
+    if (createdEntity !== undefined) {
+      return postSuccessResponse(res, resolveResponse(createdEntity));
+    } else {
+      return genericFailureResponse(res);
     }
+    // } catch (error) {
+    //   res.status(400).json({ error: error.message });
+    // }
   }
 
   @Put(':id')
