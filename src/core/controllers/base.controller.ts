@@ -35,6 +35,7 @@ export class BaseController<T extends PortalCoreEntity> {
   ) {}
 
   @Get()
+  @UseFilters(new QueryErrorFilter())
   async findAll(@Query() query): Promise<ApiResult> {
     if (query.paging === 'false') {
       const allContents: T[] = await this.baseService.findAll();
@@ -71,6 +72,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
+  @UseFilters(new QueryErrorFilter())
   async findOne(
     @Res() res: Response,
     @Param() params,
@@ -91,7 +93,7 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Post()
   @UseGuards(SessionGuard)
-  @UseFilters(new QueryErrorFilter())
+  // @UseFilters(new QueryErrorFilter())
   async create(
     @Req() req: Request,
     @Res() res: Response,
@@ -114,6 +116,7 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Put(':id')
   @UseGuards(SessionGuard)
+  @UseFilters(new QueryErrorFilter())
   async update(
     @Req() req: Request,
     @Res() res: Response,
