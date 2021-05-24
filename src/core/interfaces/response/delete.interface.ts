@@ -1,4 +1,4 @@
 export interface DeleteResponse {
-    affected?: number;
-    raw: any[];
+  affected?: number;
+  raw: any[];
 }
