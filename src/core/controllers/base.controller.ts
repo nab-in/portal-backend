@@ -48,15 +48,13 @@ export class BaseController<T extends PortalCoreEntity> {
 
     const pagerDetails: any = getPagerDetails(query);
 
-    const [entityRes, totalCount]: [
-      T[],
-      number,
-    ] = await this.baseService.findAndCount(
-      query.fields,
-      query.filter,
-      pagerDetails.pageSize,
-      pagerDetails.page - 1,
-    );
+    const [entityRes, totalCount]: [T[], number] =
+      await this.baseService.findAndCount(
+        query.fields,
+        query.filter,
+        pagerDetails.pageSize,
+        pagerDetails.page - 1,
+      );
 
     return {
       pager: {
