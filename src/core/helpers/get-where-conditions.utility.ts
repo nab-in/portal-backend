@@ -47,7 +47,7 @@ export function getWhereConditions(filter: any): any[] {
         }
         case '!in': {
           if (filterSplit[0] == 'id') {
-            return { uid: filterSplit[2] };
+            return { uid: Not(`${filterSplit[2]}`) };
           }
           return { [filterSplit[0]]: Not(filterSplit[2]) };
         }
