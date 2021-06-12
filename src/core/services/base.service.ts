@@ -25,20 +25,14 @@ export class BaseService<T extends PortalCoreEntity> {
     const metaData = this.modelRepository.manager.connection.getMetadata(
       this.Model,
     );
-    const conditions = await resolveWhere(
-      this.modelRepository,
-      getWhereConditions(filter),
+    const conditions = Object.assign(
+      {},
+      ...(await resolveWhere(this.modelRepository, getWhereConditions(filter))),
     );
-    let results = {};
-    conditions.forEach((data) => {
-      Object.keys(data).forEach((key) => {
-        results[key] = data[key];
-      });
-    });
     return await this.modelRepository.findAndCount({
       select: getSelections(fields, metaData),
       relations: getRelations(fields, metaData),
-      where: results,
+      where: conditions,
       skip: page * size,
       take: size,
     });
