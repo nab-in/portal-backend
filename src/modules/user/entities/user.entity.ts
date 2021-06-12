@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { Job } from 'src/modules/job/entities/job.entity';
 import {
   BeforeInsert,
@@ -16,18 +17,19 @@ import {
   passwordHash,
 } from '../../../core/utilities/password.hash';
 import { Company } from '../../company/entities/company.entity';
+
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
   static plural = 'users';
 
   @Column('varchar', {
-    nullable: true,
+    nullable: false,
     name: 'firstname',
   })
   firstname: string;
 
   @Column('varchar', {
-    nullable: true,
+    nullable: false,
     name: 'email',
     unique: true,
   })
@@ -51,6 +53,12 @@ export class User extends NamedEntity {
     name: 'password',
   })
   password: string;
+
+  @Column('varchar', {
+    nullable: false,
+    name: 'salt',
+  })
+  salt: string;
 
   @Column('varchar', {
     nullable: true,
@@ -91,14 +99,17 @@ export class User extends NamedEntity {
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
-    this.password = await passwordHash(this.password);
+    this.salt = await bcrypt.genSalt();
+
+    this.password = await passwordHash(this.password, this.salt);
   }
 
   @BeforeUpdate()
   async beforeUpdating() {
     this.lastupdated = new Date();
     if (this.password) {
-      this.password = await passwordHash(this.password);
+      this.salt = await bcrypt.genSalt();
+      this.password = await passwordHash(this.password, this.salt);
     }
   }
   public static async verifyUser(username: any, password: any): Promise<User> {

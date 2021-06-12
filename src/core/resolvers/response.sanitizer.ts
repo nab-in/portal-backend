@@ -12,7 +12,7 @@ export const resolveResponse: any = (responseObject: any) => {
     id: responseObject.uid,
   };
   const attributeKeys = Object.keys(
-    omit(responseObject, ['id', 'uid', 'password']),
+    omit(responseObject, ['id', 'uid', 'password', 'salt']),
   );
   attributeKeys.forEach((attributeKey) => {
     let attributeValue: string | boolean | number | any;
