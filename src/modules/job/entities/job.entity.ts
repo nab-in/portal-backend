@@ -15,14 +15,14 @@ import { Review } from '../../review/entities/review.entity';
 @Entity('job', { schema: 'public' })
 export class Job extends NamedEntity {
   static plural = 'jobs';
-  @Column('varchar', { name: 'descriptio', nullable: true })
+  @Column('varchar', { name: 'description', nullable: false })
   description: string;
 
   @Column('varchar', { name: 'location', nullable: true })
   location: string;
 
   @Column('varchar', { name: 'closedate', nullable: true })
-  closeDate: string;
+  closeDate: Date;
 
   @Column('varchar', { name: 'attachment', nullable: true })
   attachment: string;

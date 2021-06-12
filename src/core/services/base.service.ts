@@ -29,10 +29,16 @@ export class BaseService<T extends PortalCoreEntity> {
       this.modelRepository,
       getWhereConditions(filter),
     );
+    let results = {};
+    conditions.forEach((data) => {
+      Object.keys(data).forEach((key) => {
+        results[key] = data[key];
+      });
+    });
     return await this.modelRepository.findAndCount({
       select: getSelections(fields, metaData),
       relations: getRelations(fields, metaData),
-      where: conditions,
+      where: results,
       skip: page * size,
       take: size,
     });
