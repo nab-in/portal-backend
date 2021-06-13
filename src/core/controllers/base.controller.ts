@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
-import { QueryErrorFilter } from '../interceptors/error.filter';
 import { ApiResult } from '../interfaces/api-result.interface';
 import { DeleteResponse } from '../interfaces/response/delete.interface';
 import { resolveResponse } from '../resolvers/response.sanitizer';
@@ -33,7 +32,6 @@ export class BaseController<T extends PortalCoreEntity> {
   ) {}
 
   @Get()
-  @UseFilters(new QueryErrorFilter())
   async findAll(@Query() query): Promise<ApiResult> {
     if (query.paging === 'false') {
       const allContents: T[] = await this.baseService.findAll();
@@ -68,7 +66,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
-  @UseFilters(new QueryErrorFilter())
   async findOne(
     @Res() res: Response,
     @Param() params,
@@ -110,7 +107,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Put(':id')
-  @UseFilters(new QueryErrorFilter())
   async update(
     @Req() req: Request,
     @Res() res: Response,

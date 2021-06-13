@@ -13,6 +13,8 @@ import { resolveResponse } from 'src/core/resolvers/response.sanitizer';
 import { getSuccessResponse } from 'src/core/utilities/response.helper';
 import { AuthService } from '../services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { UserDecorator } from '../decorators/user.decorator';
+import { User } from '../entities/user.entity';
 
 @Controller('api')
 export class AuthController {
@@ -24,7 +26,7 @@ export class AuthController {
         loginDTO.username || loginDTO.email,
         loginDTO.password,
       );
-      if (user) {
+      if (user && !user.status) {
         return getSuccessResponse(res, resolveResponse(user));
       } else {
         return res
@@ -32,7 +34,7 @@ export class AuthController {
           .send({ message: 'Username or Password provided is incorrect.' });
       }
     } catch (e) {
-      console.log(e);
+      return e.response.message;
     }
   }
   @Get('logout')
@@ -45,7 +47,7 @@ export class AuthController {
 
   @Post('test')
   @UseGuards(AuthGuard())
-  async test(@Req() data): Promise<any> {
-    console.log('DATA', data.user);
+  async test(@UserDecorator() data: User): Promise<any> {
+    console.log('DATA', data);
   }
 }

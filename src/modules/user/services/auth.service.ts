@@ -5,7 +5,7 @@ import { User } from '../entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(private jwtService: JwtService) {}
-  async login(username: any, password: any): Promise<{ token: string }> {
+  async login(username: any, password: any): Promise<any> {
     const user: User = await User.verifyUser(username, password);
     const email = /^\S+@\S+$/;
     const isEmail = email.test(username);
@@ -23,7 +23,10 @@ export class AuthService {
         }
       }
     } else {
-      throw new Error('Username or Password Invalid');
+      return {
+        status: 406,
+        message: 'Username or Password Invalid',
+      };
     }
   }
 }

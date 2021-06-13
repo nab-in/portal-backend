@@ -1,42 +1,45 @@
 import {
   ArgumentsHost,
   Catch,
-  HttpException,
+  ExceptionFilter,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
+import { isFunction } from 'lodash';
 
 @Catch()
-export class QueryErrorFilter extends BaseExceptionFilter {
-  public catch(exception: any, host: ArgumentsHost): any {
+export class HttpErrorFilter implements ExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const context = host.switchToHttp();
+    const request = context.getRequest();
+    const response = context.getResponse();
+    let message: string;
     const detail = exception.detail;
-    let messageStart: string;
     if (typeof detail === 'string' && detail.includes('already exists')) {
-      messageStart = exception.table.split('_').join(' ') + ' with';
-      messageStart = exception.detail.replace('Key', messageStart);
+      message = exception.table.split('_').join(' ') + ' with';
+      message = exception.detail.replace('Key', message);
+    } else {
+      message = exception?.message;
     }
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<any>();
-    const request = ctx.getRequest<any>();
-
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    message = message.split('(').join('');
+    message = message.split(')').join('');
+    message = message.split('=').join(' ');
 
     const errorResponse = {
-      code: status,
+      statusCode: isFunction(exception.getStatus)
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR,
+      message,
       method: request.method,
-      message: messageStart || exception.message,
-      error: exception.Error,
+      path: request.path,
     };
 
     Logger.error(
       `${request.method} ${request.url}`,
-      JSON.stringify(errorResponse),
-      'ExceptionFilter',
+      exception.stack,
+      'Exception',
     );
-    response.status(status).json(errorResponse);
+
+    response.status(errorResponse.statusCode).json(errorResponse);
   }
 }
