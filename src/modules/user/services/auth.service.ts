@@ -1,22 +1,29 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { passwordCompare } from 'src/core/utilities/password.hash';
+import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  async login(username: any, password: any): Promise<User> {
-    const user: User = await User.findOne({ where: { username } });
-    const hashedPassword = await passwordCompare(password, user.password);
-    if (hashedPassword) {
+  constructor(private jwtService: JwtService) {}
+  async login(username: any, password: any): Promise<{ token: string }> {
+    const user: User = await User.verifyUser(username, password);
+    const email = /^\S+@\S+$/;
+    const isEmail = email.test(username);
+    if (user) {
       delete user.password;
       if (!user.enabled) {
         throw new NotAcceptableException(`Your account has been disabled`);
       } else {
-        return user;
+        if (isEmail) {
+          const token = { token: this.jwtService.sign({ email: username }) };
+          return token;
+        } else {
+          const token = { token: this.jwtService.sign({ username }) };
+          return token;
+        }
       }
     } else {
-      throwError('Username or Password Invalid');
+      throw new Error('Username or Password Invalid');
     }
   }
 }

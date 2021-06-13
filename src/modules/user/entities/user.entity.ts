@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Job } from 'src/modules/job/entities/job.entity';
+import { Job } from '../../job/entities/job.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -12,10 +12,6 @@ import {
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
-import {
-  passwordCompare,
-  passwordHash,
-} from '../../../core/utilities/password.hash';
 import { Company } from '../../company/entities/company.entity';
 
 @Entity('user', { schema: 'public' })
@@ -100,8 +96,7 @@ export class User extends NamedEntity {
     this.lastupdated = new Date();
     this.uid = generateUid();
     this.salt = await bcrypt.genSalt();
-
-    this.password = await passwordHash(this.password, this.salt);
+    this.password = await this.hashPassword(this.password, this.salt);
   }
 
   @BeforeUpdate()
@@ -109,11 +104,11 @@ export class User extends NamedEntity {
     this.lastupdated = new Date();
     if (this.password) {
       this.salt = await bcrypt.genSalt();
-      this.password = await passwordHash(this.password, this.salt);
+      this.password = await this.hashPassword(this.password, this.salt);
     }
   }
-  public static async verifyUser(username: any, password: any): Promise<User> {
-    let user: User;
+  public static async verifyUser(username: any, password: any): Promise<any> {
+    let user: any;
     const email = /^\S+@\S+$/;
     const isEmail = email.test(username);
     if (isEmail) {
@@ -125,11 +120,26 @@ export class User extends NamedEntity {
         where: { username },
       });
     }
-    if (user && (await passwordCompare(password, user.password))) {
+    if (
+      user &&
+      (await this.validatePassword(password, user.salt, user.password))
+    ) {
       delete user.password;
+      delete user.salt;
       return user;
     } else {
       return null;
     }
+  }
+  async hashPassword(password: string, salt: string): Promise<any> {
+    return bcrypt.hash(password, salt);
+  }
+  public static async validatePassword(
+    password: string,
+    salt: string,
+    userpassword: string,
+  ): Promise<boolean> {
+    const hash = await bcrypt.hash(password, salt);
+    return hash === userpassword;
   }
 }

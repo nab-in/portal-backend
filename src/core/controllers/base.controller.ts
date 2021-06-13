@@ -10,10 +10,8 @@ import {
   Req,
   Res,
   UseFilters,
-  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { SessionGuard } from '../../modules/user/guards/session.guard';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { QueryErrorFilter } from '../interceptors/error.filter';
 import { ApiResult } from '../interfaces/api-result.interface';
@@ -90,7 +88,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Post()
-  @UseGuards(SessionGuard)
   // @UseFilters(new QueryErrorFilter())
   async create(
     @Req() req: Request,
@@ -113,7 +110,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Put(':id')
-  @UseGuards(SessionGuard)
   @UseFilters(new QueryErrorFilter())
   async update(
     @Req() req: Request,
@@ -142,7 +138,6 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Delete(':id')
-  @UseGuards(SessionGuard)
   async delete(
     @Param() params,
     @Req() req: Request,
