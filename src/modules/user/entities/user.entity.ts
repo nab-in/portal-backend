@@ -1,5 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { Job } from '../../job/entities/job.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -8,11 +8,13 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
+  ManyToOne
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
+import { Job } from '../../job/entities/job.entity';
+
 
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
@@ -22,6 +24,7 @@ export class User extends NamedEntity {
     nullable: false,
     name: 'firstname',
   })
+  @ApiProperty()
   firstname: string;
 
   @Column('varchar', {
