@@ -23,14 +23,14 @@ async function bootstrap() {
 
   app.use(Compression());
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Portal Backend')
+    .setDescription('All Portal API backend endpoints')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('Job Portal')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(9000);
 }
 bootstrap();
