@@ -15,10 +15,13 @@ export class AuthService {
         throw new NotAcceptableException(`Your account has been disabled`);
       } else {
         if (isEmail) {
-          const token = { token: this.jwtService.sign({ email: username }) };
+          const token = {
+            token: this.jwtService.sign({ email: username }),
+            ...user,
+          };
           return token;
         } else {
-          const token = { token: this.jwtService.sign({ username }), user };
+          const token = { token: this.jwtService.sign({ username }), ...user };
           return token;
         }
       }
