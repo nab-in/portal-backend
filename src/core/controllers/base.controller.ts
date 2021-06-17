@@ -88,7 +88,6 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  // @UseFilters(new QueryErrorFilter())
   async create(
     @Req() req: Request,
     @Res() res: Response,
@@ -99,8 +98,8 @@ export class BaseController<T extends PortalCoreEntity> {
       const resolvedEntity = await this.baseService.EntityUidResolver(
         createEntityDto,
         user,
+        'POST',
       );
-      console.log('RESOLVED', resolvedEntity);
       const createdEntity = await this.baseService.create(resolvedEntity);
       if (createdEntity !== undefined) {
         return postSuccessResponse(res, resolveResponse(createdEntity));
@@ -125,6 +124,7 @@ export class BaseController<T extends PortalCoreEntity> {
       updateEntityDto['id'] = updateEntity['id'];
       const resolvedEntityDTO: any = await this.baseService.EntityUidResolver(
         updateEntityDto,
+        'PUT',
       );
       const payload = await this.baseService.update(resolvedEntityDTO);
       if (payload) {

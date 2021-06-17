@@ -1,6 +1,11 @@
 import { entityDatabaseMapping } from '../resolvers/entity-database.mapping.resolver';
 
-export const resolvedResponse = async ({ payload, repository, user }) => {
+export const resolvedResponse = async ({
+  payload,
+  repository,
+  user,
+  method,
+}) => {
   const newPayload: { [x: string]: any } = {};
   const payloadKeys = Object.keys(payload);
   for (const key of payloadKeys) {
@@ -25,8 +30,13 @@ export const resolvedResponse = async ({ payload, repository, user }) => {
       `SELECT ID FROM "user" WHERE UID ='${user.id}'`,
     )
   )[0];
-  newPayload['createdBy'] = userObj;
-  newPayload['lastUpdatedBy'] = userObj;
+  if (method === 'POST') {
+    newPayload['createdBy'] = userObj;
+    newPayload['lastUpdatedBy'] = userObj;
+  }
+  if (method === 'PUT') {
+    newPayload['lastUpdatedBy'] = userObj;
+  }
   return newPayload;
 };
 

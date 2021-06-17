@@ -119,12 +119,13 @@ export class BaseService<T extends PortalCoreEntity> {
       return this.modelRepository.delete(condition);
     }
   }
-  async EntityUidResolver(entityUpdates: any, user?: any) {
+  async EntityUidResolver(entityUpdates: any, user?: any, method?) {
     if (entityUpdates) {
       const updated = await resolvedResponse({
         payload: entityUpdates,
         repository: this.modelRepository,
         user,
+        method,
       });
       return updated;
     }
