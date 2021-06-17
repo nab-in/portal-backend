@@ -10,7 +10,9 @@ import {
   Req,
   Res,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { ApiResult } from '../interfaces/api-result.interface';
@@ -85,28 +87,33 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   // @UseFilters(new QueryErrorFilter())
   async create(
     @Req() req: Request,
     @Res() res: Response,
     @Body() createEntityDto,
   ): Promise<ApiResult> {
-    // try {
-    const resolvedEntity = await this.baseService.EntityUidResolver(
-      createEntityDto,
-    );
-    const createdEntity = await this.baseService.create(resolvedEntity);
-    if (createdEntity !== undefined) {
-      return postSuccessResponse(res, resolveResponse(createdEntity));
-    } else {
-      return genericFailureResponse(res);
+    try {
+      const user = req.user;
+      const resolvedEntity = await this.baseService.EntityUidResolver(
+        createEntityDto,
+        user,
+      );
+      console.log('RESOLVED', resolvedEntity);
+      const createdEntity = await this.baseService.create(resolvedEntity);
+      if (createdEntity !== undefined) {
+        return postSuccessResponse(res, resolveResponse(createdEntity));
+      } else {
+        return genericFailureResponse(res);
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
-    // } catch (error) {
-    //   res.status(400).json({ error: error.message });
-    // }
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   async update(
     @Req() req: Request,
     @Res() res: Response,
@@ -134,6 +141,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   async delete(
     @Param() params,
     @Req() req: Request,

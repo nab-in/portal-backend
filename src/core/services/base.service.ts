@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { User } from '../../modules/user/entities/user.entity';
 import { FindConditions, Repository, UpdateResult } from 'typeorm';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { getRelations, getSelections } from '../helpers/get-fields.utility';
@@ -118,11 +119,12 @@ export class BaseService<T extends PortalCoreEntity> {
       return this.modelRepository.delete(condition);
     }
   }
-  async EntityUidResolver(entityUpdates: any) {
+  async EntityUidResolver(entityUpdates: any, user?: any) {
     if (entityUpdates) {
       const updated = await resolvedResponse({
         payload: entityUpdates,
         repository: this.modelRepository,
+        user,
       });
       return updated;
     }
