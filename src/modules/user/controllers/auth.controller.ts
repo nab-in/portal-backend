@@ -39,15 +39,9 @@ export class AuthController {
   }
   @Get('logout')
   async logout(@Req() request: any, @Res() res: any): Promise<any> {
-    request.session = null;
+    request.user = null;
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User logged out successfully' });
-  }
-
-  @Post('test')
-  @UseGuards(AuthGuard())
-  async test(@Req() data: any): Promise<any> {
-    console.log('DATA', data.user);
   }
 }

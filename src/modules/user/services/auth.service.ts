@@ -1,16 +1,35 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Job } from '../../job/entities/job.entity';
+import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @InjectRepository(User)
+    public userrepository: Repository<User>,
+
+    @InjectRepository(Job)
+    public jobrepository: Repository<Job>,
+  ) {}
   async login(username: any, password: any): Promise<any> {
     const user: User = await User.verifyUser(username, password);
     const email = /^\S+@\S+$/;
     const isEmail = email.test(username);
     if (user) {
-      delete user.password;
+      let query = `SELECT "jobId" FROM USERJOBS WHERE "userId"=${user.id}`;
+      const appliedJobs = (await this.userrepository.manager.query(query)).map(
+        (job) => job.jobId,
+      );
+      const jobs = await this.jobrepository.find({
+        where: {
+          id: In(appliedJobs),
+        },
+      });
+      user['appliedJobs'] = jobs;
       if (!user.enabled) {
         throw new NotAcceptableException(`Your account has been disabled`);
       } else {
