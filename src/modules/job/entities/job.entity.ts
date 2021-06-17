@@ -41,7 +41,7 @@ export class Job extends NamedEntity {
   createdBy: User;
 
   @ManyToOne(() => User, (user) => user.updatedJobs, { nullable: false })
-  @JoinColumn({ name: 'lastupdatedb' })
+  @JoinColumn({ name: 'lastupdatedby' })
   lastUpdatedBy: User;
 
   @BeforeInsert()

@@ -13,13 +13,21 @@ export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, call$: CallHandler): Observable<any> {
     const requestObject = context.switchToHttp().getResponse();
     const request = '' + requestObject ? requestObject.req || {} : {};
+
     return call$.handle().pipe(
       tap(async () => {
         const now = Date.now();
-        Logger.log(
-          `${request.method} ${request.url} ${Date.now() - now}ms`,
-          context.getClass().name,
-        );
+        if (request.method === 'POST' || 'PUT' || 'DELETE') {
+          Logger.log(
+            `${request.method} ${request.url} ${Date.now() - now}ms`,
+            context.getClass().name,
+          );
+        } else {
+          Logger.log(
+            `${request.method} ${request.url} ${Date.now() - now}ms`,
+            context.getClass().name,
+          );
+        }
       }),
     );
   }
