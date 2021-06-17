@@ -1,4 +1,5 @@
-import { Controller, Param, Post, Req, Res } from '@nestjs/common';
+import { Controller, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { BaseController } from '../../../core/controllers/base.controller';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import {
@@ -14,13 +15,14 @@ export class JobController extends BaseController<Job> {
     super(service, Job);
   }
   @Post(':job/apply')
+  @UseGuards(AuthGuard('jwt'))
   async apply(
     @Req() req: any,
     @Res() res: any,
     @Param() param: any,
   ): Promise<any> {
     try {
-      let user = req.session.user;
+      let user = req.user;
       const jobs = [{ id: param.job }];
       user = { ...user, jobs };
       const resolvedEntity = await this.service.EntityUidResolver(user);

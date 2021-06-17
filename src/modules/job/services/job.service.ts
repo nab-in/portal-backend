@@ -16,11 +16,10 @@ export class JobService extends BaseService<Job> {
     super(repository, Job);
   }
   async findUserJobs(uid: string): Promise<any> {
-    const user = this.userrepository.findOne({
+    const user = await this.userrepository.findOne({
       where: { uid },
       relations: ['jobs'],
     });
-    console.log('USER', user);
     return user;
   }
 }
