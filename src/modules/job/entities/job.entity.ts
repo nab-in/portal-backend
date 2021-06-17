@@ -5,6 +5,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -43,6 +45,11 @@ export class Job extends NamedEntity {
   @ManyToOne(() => User, (user) => user.updatedJobs, { nullable: false })
   @JoinColumn({ name: 'lastupdatedby' })
   lastUpdatedBy: User;
+
+  @ManyToMany(() => User, (user) => user.jobs, { nullable: false })
+  @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
+  @JoinTable({ name: 'userjobs' })
+  users: User[];
 
   @BeforeInsert()
   beforeUpdateTransaction() {

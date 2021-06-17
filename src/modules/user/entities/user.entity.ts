@@ -87,8 +87,7 @@ export class User extends NamedEntity {
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
 
-  @ManyToMany(() => Job)
-  @JoinTable({ name: 'userjobs' })
+  @ManyToMany(() => Job, (job) => job.users, { nullable: false })
   jobs: Job[];
 
   @OneToMany(() => Job, (job) => job.createdBy, {

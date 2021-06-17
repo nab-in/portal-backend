@@ -10,16 +10,28 @@ export class JobService extends BaseService<Job> {
   constructor(
     @InjectRepository(Job)
     public repository: Repository<Job>,
-    @InjectRepository(Job)
+    @InjectRepository(User)
     public userrepository: Repository<User>,
   ) {
     super(repository, Job);
   }
-  async findUserJobs(uid: string): Promise<any> {
-    const user = await this.userrepository.findOne({
+  async findUser(uid: string): Promise<User> {
+    const sessionUser = await this.userrepository.findOne({
       where: { uid },
-      relations: ['jobs'],
+      select: ['id'],
     });
-    return user;
+    return sessionUser;
+  }
+  async apply({ job, user }): Promise<{ message: string }> {
+    const query = `INSERT INTO USERJOBS("userId", "jobId") VALUES(${user.id}, ${job.id})`;
+    await this.userrepository.manager.query(query);
+    return { message: 'You have successfully applied to this job' };
+  }
+  async revoke({ job, user }): Promise<{ message: string }> {
+    const query = `DELETE FROM USERJOBS WHERE "userId" = ${user.id} AND "jobId"=${job.id}`;
+    await this.userrepository.manager.query(query);
+    return {
+      message: 'You have revoked successfully your application from this job',
+    };
   }
 }
