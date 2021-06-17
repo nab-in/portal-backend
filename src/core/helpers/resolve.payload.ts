@@ -25,17 +25,19 @@ export const resolvedResponse = async ({
       newPayload[key] = payload[key];
     }
   }
-  const userObj = (
-    await repository.manager.query(
-      `SELECT ID FROM "user" WHERE UID ='${user.id}'`,
-    )
-  )[0];
-  if (method === 'POST') {
-    newPayload['createdBy'] = userObj;
-    newPayload['lastUpdatedBy'] = userObj;
-  }
-  if (method === 'PUT') {
-    newPayload['lastUpdatedBy'] = userObj;
+  if (user) {
+    const userObj = (
+      await repository.manager.query(
+        `SELECT ID FROM "user" WHERE UID ='${user.id}'`,
+      )
+    )[0];
+    if (method === 'POST') {
+      newPayload['createdBy'] = userObj;
+      newPayload['lastUpdatedBy'] = userObj;
+    }
+    if (method === 'PUT') {
+      newPayload['lastUpdatedBy'] = userObj;
+    }
   }
   return newPayload;
 };

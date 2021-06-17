@@ -109,7 +109,7 @@ export class BaseService<T extends PortalCoreEntity> {
   async update(dataModel: any): Promise<UpdateResult> {
     if (dataModel) {
       dataModel.id = +dataModel.id;
-      return await this.modelRepository.update(dataModel.id, dataModel);
+      return await this.modelRepository.save(dataModel);
     }
   }
 

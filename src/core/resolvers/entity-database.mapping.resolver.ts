@@ -3,4 +3,5 @@ export const entityDatabaseMapping = {
   user: 'user',
   company: 'company',
   companies: 'company',
+  jobs: 'job',
 };
