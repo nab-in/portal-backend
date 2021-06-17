@@ -8,13 +8,13 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
 import { Job } from '../../job/entities/job.entity';
-
 
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
@@ -90,6 +90,16 @@ export class User extends NamedEntity {
   @ManyToMany(() => Job)
   @JoinTable({ name: 'userjobs' })
   jobs: Job[];
+
+  @OneToMany(() => Job, (job) => job.createdBy, {
+    eager: false,
+  })
+  createdJobs: Job[];
+
+  @OneToMany(() => Job, (job) => job.lastUpdatedBy, {
+    eager: false,
+  })
+  updatedJobs: Job[];
 
   @BeforeInsert()
   async beforeUpdateTransaction() {

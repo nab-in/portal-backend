@@ -47,7 +47,7 @@ export class AuthController {
 
   @Post('test')
   @UseGuards(AuthGuard())
-  async test(@UserDecorator() data: User): Promise<any> {
-    console.log('DATA', data);
+  async test(@Req() data: any): Promise<any> {
+    console.log('DATA', data.user);
   }
 }

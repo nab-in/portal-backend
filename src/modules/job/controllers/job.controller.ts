@@ -19,21 +19,21 @@ export class JobController extends BaseController<Job> {
     @Res() res: any,
     @Param() param: any,
   ): Promise<any> {
-    // try {
-    let user = req.session.user;
-    const jobs = [{ id: param.job }];
-    user = { ...user, jobs };
-    const resolvedEntity = await this.service.EntityUidResolver(user);
-    const userJobs = await this.service.findUserJobs(user.id);
-    resolvedEntity.jobs = resolvedEntity.jobs.push(userJobs);
-    const createdEntity = await this.service.update(resolvedEntity);
-    if (createdEntity !== undefined) {
-      return postSuccessResponse(res, resolveResponse(createdEntity));
-    } else {
-      return genericFailureResponse(res);
-    }
-    /* } catch (error) {
+    try {
+      let user = req.session.user;
+      const jobs = [{ id: param.job }];
+      user = { ...user, jobs };
+      const resolvedEntity = await this.service.EntityUidResolver(user);
+      const userJobs = await this.service.findUserJobs(user.id);
+      resolvedEntity.jobs = resolvedEntity.jobs.push(userJobs);
+      const createdEntity = await this.service.update(resolvedEntity);
+      if (createdEntity !== undefined) {
+        return postSuccessResponse(res, resolveResponse(createdEntity));
+      } else {
+        return genericFailureResponse(res);
+      }
+    } catch (error) {
       res.status(400).json({ error: error.message });
-    }*/
+    }
   }
 }
