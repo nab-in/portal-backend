@@ -25,7 +25,7 @@ export const resolveResponse: any = (responseObject: any) => {
       if (typeof attributeValue === 'object') {
         if (Array.isArray(attributeValue)) {
           newResponseObject[attributeKey] = responseObject[attributeKey].map(
-            (value: any) => value === resolveResponse(attributeValue),
+            (value: any) => resolveResponse(value),
           );
         } else {
           if (isNaN(Date.parse(attributeValue))) {
