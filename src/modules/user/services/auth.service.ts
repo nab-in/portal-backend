@@ -1,9 +1,14 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from '../../job/entities/job.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import jwt_decode from 'jwt-decode';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +58,25 @@ export class AuthService {
         status: 406,
         message: 'Username or Password Invalid',
       };
+    }
+  }
+  async getUser(token: string): Promise<User> {
+    try {
+      const decoded: { email: string; username: string } = jwt_decode(token);
+      let user: User;
+      if (decoded.email) {
+        user = await this.userrepository.findOne({
+          where: { email: decoded.email },
+        });
+      }
+      if (decoded.username) {
+        user = await this.userrepository.findOne({
+          where: { username: decoded.username },
+        });
+      }
+      return user;
+    } catch (e) {
+      throw new InternalServerErrorException(e.message);
     }
   }
 }
