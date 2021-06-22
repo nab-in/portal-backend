@@ -25,20 +25,6 @@ export class AuthService {
     const email = /^\S+@\S+$/;
     const isEmail = email.test(username);
     if (user) {
-      let query = `SELECT "jobId" FROM USERJOBS WHERE "userId"=${user.id}`;
-      const appliedJobs = (await this.userrepository.manager.query(query)).map(
-        (job: { jobId: any }) => job.jobId,
-      );
-      user['appliedJobs'] = await this.jobrepository.find({
-        where: {
-          id: In(appliedJobs),
-        },
-      });
-      user['createdJobs'] = await this.jobrepository.find({
-        where: {
-          createdBy: user,
-        },
-      });
       if (!user.enabled) {
         throw new NotAcceptableException(`Your account has been disabled`);
       } else {
