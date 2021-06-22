@@ -6,10 +6,13 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import { getSuccessResponse } from 'src/core/utilities/response.helper';
 import { AuthService } from '../services/auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { ExtractJwt } from 'passport-jwt';
 
 @Controller('api')
 export class AuthController {
@@ -40,13 +43,12 @@ export class AuthController {
       .send({ message: 'User logged out successfully' });
   }
   @Get('me')
-  async getUser(
-    @Body() body: { token: string },
-    @Res() res: any,
-  ): Promise<any> {
+  @UseGuards(AuthGuard('jwt'))
+  async getUser(@Req() req: any, @Res() res: any): Promise<any> {
     try {
-      const user = await this.authService.getUser(body.token);
-      return res.status(HttpStatus.OK).send(resolveResponse(user));
-    } catch (e) {}
+      return res.status(HttpStatus.OK).send(resolveResponse(req.user));
+    } catch (e) {
+      throw new Error(e.message);
+    }
   }
 }
