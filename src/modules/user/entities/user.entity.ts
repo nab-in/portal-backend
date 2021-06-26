@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from '../../userrole/entities/userrole.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -99,6 +100,9 @@ export class User extends NamedEntity {
     eager: false,
   })
   updatedJobs: Job[];
+
+  @OneToMany(() => UserRole, (userrole) => userrole.user)
+  userroles: UserRole[];
 
   @BeforeInsert()
   async beforeUpdateTransaction() {
