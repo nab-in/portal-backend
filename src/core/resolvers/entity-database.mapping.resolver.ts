@@ -4,4 +4,5 @@ export const entityDatabaseMapping = {
   company: 'company',
   companies: 'company',
   jobs: 'job',
+  parent: 'jobcategory',
 };
