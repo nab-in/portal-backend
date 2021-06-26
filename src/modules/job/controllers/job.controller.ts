@@ -6,9 +6,11 @@ import {
   Post,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { BaseController } from '../../../core/controllers/base.controller';
 import { genericFailureResponse } from '../../../core/utilities/response.helper';
 import { User } from '../../user/entities/user.entity';
@@ -22,12 +24,12 @@ export class JobController extends BaseController<Job> {
   }
   @Post(':job/apply')
   @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
   async apply(
     @Req() req: any,
     @Res() res: any,
     @Param() param: any,
   ): Promise<any> {
-    try {
       const user: User = await this.service.findUser(req.user.id);
       const job = await this.service.findOneByUid(param.job);
       const createdEntity = await this.service.apply({ job, user });
@@ -36,18 +38,15 @@ export class JobController extends BaseController<Job> {
       } else {
         return genericFailureResponse(res);
       }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
   }
   @Delete(':job/revoke')
   @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
   async revoke(
     @Req() req: any,
     @Res() res: any,
     @Param() param: any,
   ): Promise<any> {
-    try {
       const user: User = await this.service.findUser(req.user.id);
       const job = await this.service.findOneByUid(param.job);
       const createdEntity = await this.service.revoke({ job, user });
@@ -56,8 +55,5 @@ export class JobController extends BaseController<Job> {
       } else {
         return genericFailureResponse(res);
       }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
   }
 }

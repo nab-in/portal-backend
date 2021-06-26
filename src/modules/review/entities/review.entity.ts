@@ -1,19 +1,25 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { Job } from 'src/modules/job/entities/job.entity';
+import { Job } from '../../job/entities/job.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
+  Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
-@Entity('Review', { schema: 'public' })
+@Entity('review', { schema: 'public' })
 export class Review extends NamedEntity {
   static plural = 'reviews';
 
-  @OneToMany(() => Job, (job) => job.reviews, {
-    cascade: true,
+  @Column('bigint', { name: 'value', nullable: true })
+  value: number;
+
+  @ManyToOne(() => Job, (job) => job.reviews, {
+    cascade: false,
+    nullable: false,
   })
   @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
   job: Job;

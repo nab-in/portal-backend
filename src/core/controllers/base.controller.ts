@@ -15,6 +15,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
+import { HttpErrorFilter } from '../interceptors/error.filter';
 import { ApiResult } from '../interfaces/api-result.interface';
 import { DeleteResponse } from '../interfaces/response/delete.interface';
 import { resolveResponse } from '../resolvers/response.sanitizer';
@@ -68,6 +69,7 @@ export class BaseController<T extends PortalCoreEntity> {
   }
 
   @Get(':id')
+  @UseFilters(new HttpErrorFilter())
   async findOne(
     @Res() res: Response,
     @Param() params,
@@ -88,31 +90,29 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
   async create(
     @Req() req: Request,
     @Res() res: Response,
     @Body() createEntityDto,
   ): Promise<ApiResult> {
-    try {
-      const user = req.user;
-      const resolvedEntity = await this.baseService.EntityUidResolver(
-        createEntityDto,
-        user,
-        'POST',
-      );
-      const createdEntity = await this.baseService.create(resolvedEntity);
-      if (createdEntity !== undefined) {
-        return postSuccessResponse(res, resolveResponse(createdEntity));
-      } else {
-        return genericFailureResponse(res);
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    const user = req.user;
+    const resolvedEntity = await this.baseService.EntityUidResolver(
+      createEntityDto,
+      user,
+      'POST',
+    );
+    const createdEntity = await this.baseService.create(resolvedEntity);
+    if (createdEntity !== undefined) {
+      return postSuccessResponse(res, resolveResponse(createdEntity));
+    } else {
+      return genericFailureResponse(res);
     }
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
   async update(
     @Req() req: Request,
     @Res() res: Response,
@@ -142,25 +142,20 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
   async delete(
     @Param() params,
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<ApiResult> {
-    try {
-      const entity = await this.baseService.findOneByUid(params.id);
-      if (entity !== undefined) {
-        const deleteResponse: DeleteResponse = await this.baseService.delete(
-          params.id,
-        );
-        return deleteSuccessResponse(req, res, params, deleteResponse);
-      } else {
-        return genericFailureResponse(res, params);
-      }
-    } catch (error) {
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .send(`A property with ID ${params.id} is not available`);
+    const entity = await this.baseService.findOneByUid(params.id);
+    if (entity !== undefined) {
+      const deleteResponse: DeleteResponse = await this.baseService.delete(
+        params.id,
+      );
+      return deleteSuccessResponse(req, res, params, deleteResponse);
+    } else {
+      return genericFailureResponse(res, params);
     }
   }
 }
