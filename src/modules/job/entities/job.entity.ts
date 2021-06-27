@@ -15,6 +15,7 @@ import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
 import { Review } from '../../review/entities/review.entity';
+import { JobCategory } from './job-category.entity';
 
 @Entity('job', { schema: 'public' })
 export class Job extends NamedEntity {
@@ -50,6 +51,13 @@ export class Job extends NamedEntity {
   @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
   @JoinTable({ name: 'userjobs' })
   users: User[];
+
+  @ManyToMany(() => JobCategory, (categories) => categories.jobs, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
+  @JoinTable({ name: 'categoriesjob' })
+  categories: JobCategory[];
 
   @BeforeInsert()
   beforeUpdateTransaction() {
