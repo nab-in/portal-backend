@@ -24,9 +24,15 @@ export const resolveResponse: any = (responseObject: any) => {
     if (attributeValue || attributeValue === false) {
       if (typeof attributeValue === 'object') {
         if (Array.isArray(attributeValue)) {
-          newResponseObject[attributeKey] = responseObject[attributeKey].map(
-            (value: any) => resolveResponse(value),
-          );
+          if (attributeKey === 'children' && attributeValue.length > 0) {
+            newResponseObject[attributeKey] = responseObject[attributeKey].map(
+              (value: any) => resolveResponse(value),
+            );
+          } else {
+            newResponseObject[attributeKey] = responseObject[attributeKey].map(
+              (value: any) => resolveResponse(value),
+            );
+          }
         } else {
           if (isNaN(Date.parse(attributeValue))) {
             newResponseObject[attributeKey] = resolveResponse(attributeValue);
