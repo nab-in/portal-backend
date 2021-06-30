@@ -5,19 +5,23 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  Tree,
+  TreeChildren,
+  TreeParent,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Job } from './job.entity';
 
 @Entity('jobcategory', { schema: 'public' })
+@Tree('materialized-path')
 export class JobCategory extends NamedEntity {
   static plural = 'jobCategories';
 
-  @ManyToOne(() => JobCategory, (jobParent) => jobParent.children)
+  @TreeParent()
   parent: JobCategory;
 
-  @OneToMany(() => JobCategory, (category) => category.parent)
+  @TreeChildren()
   children: JobCategory[];
 
   @ManyToMany(() => Job, (job) => job.categories, { nullable: true })
