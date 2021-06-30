@@ -28,7 +28,8 @@ export const resolveResponse: any = (responseObject: any) => {
             newResponseObject[attributeKey] = responseObject[attributeKey].map(
               (value: any) => resolveResponse(value),
             );
-          } else {
+          }
+          if (attributeKey !== 'children') {
             newResponseObject[attributeKey] = responseObject[attributeKey].map(
               (value: any) => resolveResponse(value),
             );
