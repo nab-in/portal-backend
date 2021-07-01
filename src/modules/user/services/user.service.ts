@@ -4,12 +4,17 @@ import { BaseService } from 'src/core/services/base.service';
 import { Job } from '../../job/entities/job.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { CompanyUser } from '../entities/companyuser.entity';
 
 @Injectable()
 export class UserService extends BaseService<User> {
   constructor(
     @InjectRepository(User)
     public repository: Repository<User>,
+
+    @InjectRepository(User)
+    public companyuserrepository: Repository<CompanyUser>,
+
 
     @InjectRepository(Job)
     public jobrepository: Repository<Job>,
@@ -40,4 +45,23 @@ export class UserService extends BaseService<User> {
     });
     return [jobs, total];
   }
+
+
+  async belongToCompany( user, companyid ): Promise<any> {
+
+    const userToFind = await this.companyuserrepository.findOne({ where: { id: user.id } });
+    
+    // console.log(userToFind)
+    if(userToFind){
+      if(userToFind.company.uid == companyid){
+        return {BelongstoCompany: true}
+      } else return {BelongstoCompany: false}
+    } else return {message: 'This user is not present in the system'}
+
+  }
+
+
+
+
+
 }

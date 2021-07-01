@@ -17,9 +17,9 @@ import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
 import { Job } from '../../job/entities/job.entity';
 
-@Entity('user', { schema: 'public' })
-export class User extends NamedEntity {
-  static plural = 'users';
+@Entity('companyuser', { schema: 'public' })
+export class CompanyUser extends NamedEntity {
+  static plural = 'companyusers';
 
   @Column('varchar', {
     nullable: false,
@@ -128,11 +128,11 @@ export class User extends NamedEntity {
     const email = /^\S+@\S+$/;
     const isEmail = email.test(username);
     if (isEmail) {
-      user = await User.findOne({
+      user = await CompanyUser.findOne({
         where: { email: username },
       });
     } else {
-      user = await User.findOne({
+      user = await CompanyUser.findOne({
         where: { username },
       });
     }
@@ -159,3 +159,4 @@ export class User extends NamedEntity {
     return hash === userpassword;
   }
 }
+
