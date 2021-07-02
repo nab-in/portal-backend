@@ -26,6 +26,13 @@ export class Job extends NamedEntity {
   @Column('varchar', { name: 'location', nullable: true })
   location: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'email',
+    unique: true,
+  })
+  email: string;
+
   @Column('date', { name: 'closedate', nullable: true })
   closeDate: Date;
 
