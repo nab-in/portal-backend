@@ -168,27 +168,24 @@ export class UserController extends BaseController<User> {
     @Param() params,
     @Query() query,
     @Body() body: any,
-    @Req() req:any
-  ):Promise<any> {
-
-    const user = await this.service.findOneByUid(req.user.id);
+    @Req() req: any,
+  ): Promise<any> {
     const company = body.company;
-    
-    if(company){
-      const Belongs = await this.service.belongToCompany(user,company)
+
+    if (company) {
+      const Belongs = await this.service.belongToCompany(body.user, company);
       if (Belongs) {
-       return getSuccessResponse(res, resolveResponse(Belongs));
-     } else {
-       return res.status(HttpStatus.NOT_FOUND).send({
-         message: `There was no company with id ${body.company} in the system`,
-       });
-     }
+        return getSuccessResponse(res, resolveResponse(Belongs));
+      } else {
+        return res.status(HttpStatus.NOT_FOUND).send({
+          message: `There was no company with id ${body.company} in the system`,
+        });
+      }
     } else {
       return res.status(HttpStatus.NOT_FOUND).send({
         message: `company attribute is requred`,
       });
     }
-   
   }
 
   @Get(':id')
@@ -208,7 +205,4 @@ export class UserController extends BaseController<User> {
       });
     }
   }
-
-
-  
 }

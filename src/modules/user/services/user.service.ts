@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/services/base.service';
 import { Job } from '../../job/entities/job.entity';
 import { Company } from '../../company/entities/company.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -15,7 +14,6 @@ export class UserService extends BaseService<User> {
 
     @InjectRepository(Company)
     public companyrepository: Repository<Company>,
-
 
     @InjectRepository(Job)
     public jobrepository: Repository<Job>,
@@ -47,24 +45,16 @@ export class UserService extends BaseService<User> {
     return [jobs, total];
   }
 
+  async belongToCompany(uid: string, companyid: string): Promise<any> {
+    const userCompany = await this.repository.findOne({
+      where: { uid },
+      relations: ['company'],
+    });
 
-  async belongToCompany( user, companyid ): Promise<any> {
-
-    let query = `SELECT * FROM public."user" WHERE "id"=${user.id}`;
-    
-    const userToFind = (await this.repository.manager.query(query))[0];
-   
-
-    const company = await this.companyrepository.findOne({ where: { id: userToFind.companyid } });
-   
-    
-    if(company){
-      if(company.uid == companyid){
-        return {BelongstoCompany: true}
-      } else return {BelongstoCompany: false}
-    } else return {message: 'This user is not present in the system'}
-
+    if (userCompany && userCompany.company.uid === companyid) {
+      return { message: 'User belongs to company', payload: userCompany };
+    } else {
+      throw new NotFoundException('User does not belong to company');
+    }
   }
-
-
 }
