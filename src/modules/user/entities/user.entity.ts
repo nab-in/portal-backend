@@ -84,7 +84,7 @@ export class User extends NamedEntity {
   })
   enabled: boolean;
 
-  @ManyToOne(() => Company, (company) => company.users, {eager: true})
+  @ManyToOne(() => Company, (company) => company.users)
   @JoinColumn({ name: 'companyid', referencedColumnName: 'id'})
   company: Company;
 

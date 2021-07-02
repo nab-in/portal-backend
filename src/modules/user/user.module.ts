@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from '../job/entities/job.entity';
+import { Company } from '../company/entities/company.entity';
 import { AuthController } from './controllers/auth.controller';
 import { UserController } from './controllers/user.controller';
 import { User } from './entities/user.entity';
@@ -11,7 +12,7 @@ import { JwtPassportStrategy } from './services/jwt.strategy.service';
 import { UserService } from './services/user.service';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Job]),
+    TypeOrmModule.forFeature([User, Job, Company]),
     JwtModule.register({
       secret: 'portalbackendis&awesome',
       signOptions: { expiresIn: 317168007729 },
