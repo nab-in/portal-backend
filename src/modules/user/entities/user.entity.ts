@@ -85,7 +85,7 @@ export class User extends NamedEntity {
   enabled: boolean;
 
   @ManyToOne(() => Company, (company) => company.users)
-  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'companyid', referencedColumnName: 'id'})
   company: Company;
 
   @ManyToMany(() => Job, (job) => job.users, { nullable: true })

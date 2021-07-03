@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/services/base.service';
 import { Job } from '../../job/entities/job.entity';
+import { Company } from '../../company/entities/company.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 
@@ -10,6 +11,9 @@ export class UserService extends BaseService<User> {
   constructor(
     @InjectRepository(User)
     public repository: Repository<User>,
+
+    @InjectRepository(Company)
+    public companyrepository: Repository<Company>,
 
     @InjectRepository(Job)
     public jobrepository: Repository<Job>,
@@ -39,5 +43,18 @@ export class UserService extends BaseService<User> {
       take: size,
     });
     return [jobs, total];
+  }
+
+  async belongToCompany(uid: string, companyid: string): Promise<any> {
+    const userCompany = await this.repository.findOne({
+      where: { uid },
+      relations: ['company'],
+    });
+
+    if (userCompany && userCompany.company.uid === companyid) {
+      return { message: 'User belongs to company', payload: userCompany };
+    } else {
+      throw new NotFoundException('User does not belong to company');
+    }
   }
 }
