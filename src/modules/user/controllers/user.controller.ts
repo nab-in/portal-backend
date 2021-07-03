@@ -182,7 +182,7 @@ export class UserController extends BaseController<User> {
       }
     } else {
       return res.status(HttpStatus.NOT_FOUND).send({
-        message: `Company attribute is requred`,
+        message: `Missing a required Company attribute.`,
       });
     }
   }
