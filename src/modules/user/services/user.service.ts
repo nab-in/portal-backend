@@ -45,16 +45,20 @@ export class UserService extends BaseService<User> {
     return [jobs, total];
   }
 
-  async belongToCompany(uid: string, companyid: string): Promise<any> {
+  async belongToCompany(uid: string, company: string): Promise<any> {
     const userCompany = await this.repository.findOne({
       where: { uid },
       relations: ['company'],
     });
 
-    if (userCompany && userCompany.company.uid === companyid) {
-      return { message: 'User belongs to company', payload: userCompany };
+    if (userCompany) {
+      if (userCompany.company && userCompany.company.uid === company) {
+        return { message: 'User belongs to company', payload: userCompany };
+      } else {
+        throw new NotFoundException(`User does not belong to company`);
+      }
     } else {
-      throw new NotFoundException('User does not belong to company');
+      throw new NotFoundException(`User with id ${uid} does not exist`);
     }
   }
 }

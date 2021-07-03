@@ -165,15 +165,14 @@ export class UserController extends BaseController<User> {
   @UseFilters(new HttpErrorFilter())
   async belongCompany(
     @Res() res: any,
-    @Param() params,
-    @Query() query,
     @Body() body: any,
     @Req() req: any,
   ): Promise<any> {
-    const company = body.company;
-
-    if (company) {
-      const Belongs = await this.service.belongToCompany(body.user, company);
+    if (body.company) {
+      const Belongs = await this.service.belongToCompany(
+        req.user.id,
+        body.company,
+      );
       if (Belongs) {
         return getSuccessResponse(res, resolveResponse(Belongs));
       } else {
@@ -183,7 +182,7 @@ export class UserController extends BaseController<User> {
       }
     } else {
       return res.status(HttpStatus.NOT_FOUND).send({
-        message: `company attribute is requred`,
+        message: `Missing a required Company attribute.`,
       });
     }
   }
