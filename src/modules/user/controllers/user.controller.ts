@@ -169,18 +169,25 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ): Promise<any> {
     if (body.company) {
-      const user: User = await this.service.findOneByUid(req.user.id);
-      const Belongs = await this.service.belongToCompany(user, body.company);
-      if (Belongs) {
-        return getSuccessResponse(res, resolveResponse(Belongs));
+      const company = await this.service.findCompany(body.company);
+      if (company) {
+        const user: User = await this.service.findOneByUid(req.user.id);
+        const Belongs = await this.service.belongToCompany(user, body.company);
+        if (Belongs) {
+          return getSuccessResponse(res, resolveResponse(Belongs));
+        } else {
+          return res.status(HttpStatus.NOT_FOUND).send({
+            error: `There was no company with id ${body.company} in the system`,
+          });
+        }
       } else {
         return res.status(HttpStatus.NOT_FOUND).send({
-          message: `There was no company with id ${body.company} in the system`,
+          error: `A company with id ${body.company} is not available in the system`,
         });
       }
     } else {
       return res.status(HttpStatus.NOT_FOUND).send({
-        message: `Missing a required Company attribute.`,
+        error: `Missing a required Company attribute.`,
       });
     }
   }

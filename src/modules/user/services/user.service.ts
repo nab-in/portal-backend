@@ -45,16 +45,21 @@ export class UserService extends BaseService<User> {
     return [jobs, total];
   }
 
-  async belongToCompany(user: User, uid: string): Promise<any> {
-    const userCompany = (
-      await this.companyrepository.find({
-        where: { createdBy: user },
-      })
-    ).filter((company) => company.uid === uid);
+  async belongToCompany(
+    user: User,
+    uid: string,
+  ): Promise<{ message: string | boolean }> {
+    const userCompany = await this.companyrepository.find({
+      where: { createdBy: user, uid },
+    });
     if (userCompany.length > 0) {
       return { message: true };
     } else {
       throw new NotFoundException(`User does not belong to company`);
     }
+  }
+  async findCompany(uid: string): Promise<Company> {
+    const company = await this.companyrepository.findOne({ uid });
+    return company;
   }
 }
