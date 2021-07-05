@@ -81,14 +81,13 @@ export class JobController extends BaseController<Job> {
     }),
   )
   async uploadedFile(@UploadedFile() file, @Req() req, @Body() body: any) {
-    const job = await this.service.findOneByUid(body.company);
-
+    const job = await this.service.findOneByUid(body.job);
     const response = {
       originalname: file.originalname,
       filename: file.filename,
     };
     if (job) {
-      job['attachment'] = file.filename;
+      job['attachment'] = '/api/' + file.filename + '/attachment';
       await this.service.update(job);
       return response;
     } else {
@@ -121,9 +120,7 @@ export class JobController extends BaseController<Job> {
     return response;
   }
   @Get(':imgpath/attachment')
-  @UseGuards(AuthGuard('jwt'))
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    console.log('imgpath');
     return res.sendFile(image, { root: 'src/files' });
   }
 }
