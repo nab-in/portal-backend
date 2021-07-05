@@ -72,6 +72,36 @@ export class User extends NamedEntity {
   })
   dp: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'title',
+  })
+  title: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'bio',
+  })
+  bio: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'location',
+  })
+  location: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'websitelink',
+  })
+  websitelink: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'cvlink',
+  })
+  cvlink: string;
+
   @Column('boolean', {
     nullable: false,
     name: 'verified',
