@@ -176,7 +176,7 @@ export class JobController extends BaseController<Job> {
     return res.status(HttpStatus.CREATED).send(saved);
   }
 
-  @Post(':job/remove')
+  @Delete(':job/remove')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
   async removeJob(
@@ -187,6 +187,6 @@ export class JobController extends BaseController<Job> {
     const job = await this.service.findOneByUid(param.job);
     const user = await this.service.findUser(req.user.id);
     const saved = await this.service.removeJob(job.id, user.id);
-    return res.status(HttpStatus.CREATED).send(saved);
+    return res.status(HttpStatus.OK).send(saved);
   }
 }
