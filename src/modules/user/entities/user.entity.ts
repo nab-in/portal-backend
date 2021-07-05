@@ -85,7 +85,7 @@ export class User extends NamedEntity {
   enabled: boolean;
 
   @ManyToOne(() => Company, (company) => company.users)
-  @JoinColumn({ name: 'companyid', referencedColumnName: 'id'})
+  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
   company: Company;
 
   @ManyToMany(() => Job, (job) => job.users, { nullable: true })
@@ -100,6 +100,16 @@ export class User extends NamedEntity {
     eager: false,
   })
   updatedJobs: Job[];
+
+  @OneToMany(() => Company, (company) => company.createdBy, {
+    eager: false,
+  })
+  createdCompanies: Job[];
+
+  @OneToMany(() => Company, (company) => company.lastUpdatedBy, {
+    eager: false,
+  })
+  updatedCompanies: Job[];
 
   @OneToMany(() => UserRole, (userrole) => userrole.user)
   userroles: UserRole[];

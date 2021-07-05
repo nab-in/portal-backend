@@ -1,7 +1,15 @@
 import { generateUid } from 'src/core/helpers/makeuid.helper';
 import { Job } from 'src/modules/job/entities/job.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import {
+  JoinColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('company', { schema: 'public' })
 export class Company extends NamedEntity {
@@ -49,6 +57,14 @@ export class Company extends NamedEntity {
     cascade: true,
   })
   users: User[];
+
+  @ManyToOne(() => User, (user) => user.createdCompanies, { nullable: false })
+  @JoinColumn({ name: 'createdby' })
+  createdBy: User;
+
+  @ManyToOne(() => User, (user) => user.updatedCompanies, { nullable: false })
+  @JoinColumn({ name: 'lastupdatedby' })
+  lastUpdatedBy: User;
 
   @BeforeInsert()
   beforeUpdateTransaction() {

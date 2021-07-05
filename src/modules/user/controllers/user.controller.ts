@@ -169,10 +169,8 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ): Promise<any> {
     if (body.company) {
-      const Belongs = await this.service.belongToCompany(
-        req.user.id,
-        body.company,
-      );
+      const user: User = await this.service.findOneByUid(req.user.id);
+      const Belongs = await this.service.belongToCompany(user, body.company);
       if (Belongs) {
         return getSuccessResponse(res, resolveResponse(Belongs));
       } else {
