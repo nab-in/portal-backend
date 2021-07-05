@@ -16,18 +16,22 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
-import { BaseController } from '../../../core/controllers/base.controller';
-import { genericFailureResponse } from '../../../core/utilities/response.helper';
-import { User } from '../../user/entities/user.entity';
-import { Job } from '../entities/job.entity';
-import { JobService } from '../services/job.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
   imageFileFilter,
 } from '../../../core/helpers/sanitize-image';
+import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
+import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
+import {
+  genericFailureResponse,
+  postSuccessResponse,
+} from '../../../core/utilities/response.helper';
+import { User } from '../../user/entities/user.entity';
+import { Job } from '../entities/job.entity';
+import { JobService } from '../services/job.service';
 
 @Controller('api/' + Job.plural)
 export class JobController extends BaseController<Job> {
@@ -47,6 +51,42 @@ export class JobController extends BaseController<Job> {
     const createdEntity = await this.service.apply({ job, user });
     if (createdEntity !== undefined) {
       return res.status(HttpStatus.OK).send(createdEntity);
+    } else {
+      return genericFailureResponse(res);
+    }
+  }
+
+  @Post()
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  @UseInterceptors(
+    FileInterceptor('attachment', {
+      storage: diskStorage({
+        destination: 'src/files',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async createJobs(
+    @Req() req: any,
+    @Res() res: any,
+    @Body() createEntityDto,
+    @UploadedFile() file,
+  ): Promise<any> {
+    const user = req.user;
+    const resolvedEntity = await this.service.EntityUidResolver(
+      createEntityDto,
+      user,
+      'POST',
+    );
+    if (file && file.name) {
+      resolvedEntity['attachment'] = '/api/' + file.filename + '/attachment';
+    }
+
+    const createdEntity = await this.service.create(resolvedEntity);
+    if (createdEntity !== undefined) {
+      return postSuccessResponse(res, resolveResponse(createdEntity));
     } else {
       return genericFailureResponse(res);
     }
@@ -109,15 +149,14 @@ export class JobController extends BaseController<Job> {
     }),
   )
   async uploadMultipleFiles(@UploadedFiles() files) {
-    const response = [];
-    files.forEach((file) => {
+    const fileData = files.map((file: { originalname: any; filename: any }) => {
       const fileReponse = {
         originalname: file.originalname,
         filename: file.filename,
       };
-      response.push(fileReponse);
+      return fileReponse;
     });
-    return response;
+    return fileData;
   }
   @Get(':imgpath/attachment')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
