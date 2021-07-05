@@ -67,9 +67,4 @@ export class UserService extends BaseService<User> {
     const job = await this.jobrepository.findOne({ uid });
     return job;
   }
-  async saveJob(userid, jobid): Promise<{ message: string }> {
-    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${userid}, ${jobid})`;
-    await this.repository.manager.query(sql);
-    return { message: `Job saved successfully` };
-  }
 }

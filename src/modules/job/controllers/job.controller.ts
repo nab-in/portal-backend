@@ -162,4 +162,31 @@ export class JobController extends BaseController<Job> {
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: 'src/files' });
   }
+  @Post(':job/save')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async saveJob(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() param,
+  ): Promise<any> {
+    const job = await this.service.findOneByUid(param.job);
+    const user = await this.service.findUser(req.user.id);
+    const saved = await this.service.saveJob(job.id, user.id);
+    return res.status(HttpStatus.CREATED).send(saved);
+  }
+
+  @Post(':job/remove')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async removeJob(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() param,
+  ): Promise<any> {
+    const job = await this.service.findOneByUid(param.job);
+    const user = await this.service.findUser(req.user.id);
+    const saved = await this.service.removeJob(job.id, user.id);
+    return res.status(HttpStatus.CREATED).send(saved);
+  }
 }

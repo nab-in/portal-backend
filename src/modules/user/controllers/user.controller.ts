@@ -48,19 +48,6 @@ export class UserController extends BaseController<User> {
     }
   }
 
-  @Post(':job/save')
-  @UseFilters(new HttpErrorFilter())
-  @UseGuards(AuthGuard('jwt'))
-  async saveJob(
-    @Req() req: any,
-    @Res() res: any,
-    @Param() param,
-  ): Promise<any> {
-    const job = await this.service.findJob(param.job);
-    const user = await this.service.findOneByUid(req.user.id);
-    const saved = await this.service.saveJob(job.id, user.id);
-    return res.status(HttpStatus.CREATED).send(saved);
-  }
   @Get('appliedJobs')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
