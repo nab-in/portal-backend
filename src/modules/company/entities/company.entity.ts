@@ -48,6 +48,18 @@ export class Company extends NamedEntity {
   })
   about: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'bio',
+  })
+  bio: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'websitelink',
+  })
+  websitelink: string;
+
   @OneToMany(() => Job, (job) => job.company, {
     cascade: true,
   })
