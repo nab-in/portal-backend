@@ -34,4 +34,14 @@ export class JobService extends BaseService<Job> {
       message: 'You have revoked successfully your application from this job',
     };
   }
+  async saveJob(userid, jobid): Promise<{ message: string }> {
+    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${userid}, ${jobid})`;
+    await this.repository.manager.query(sql);
+    return { message: `Job saved successfully` };
+  }
+  async removeJob(userid, jobid): Promise<{ message: string }> {
+    const sql = `DELETE FROM SAVEDJOB  WHERE USERID=${userid} AND JOBID=${jobid}`;
+    await this.repository.manager.query(sql);
+    return { message: `Job removed successfully` };
+  }
 }
