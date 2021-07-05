@@ -34,6 +34,7 @@ export class UserService extends BaseService<User> {
     });
     return [jobs, total];
   }
+
   async createdJobs({ user, page, size }): Promise<any> {
     const [jobs, total] = await this.jobrepository.findAndCount({
       where: {
@@ -61,5 +62,14 @@ export class UserService extends BaseService<User> {
   async findCompany(uid: string): Promise<Company> {
     const company = await this.companyrepository.findOne({ uid });
     return company;
+  }
+  async findJob(uid: string): Promise<Job> {
+    const job = await this.jobrepository.findOne({ uid });
+    return job;
+  }
+  async saveJob(userid, jobid): Promise<{ message: string }> {
+    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${userid}, ${jobid})`;
+    await this.repository.manager.query(sql);
+    return { message: `Job saved successfully` };
   }
 }

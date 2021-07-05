@@ -121,6 +121,20 @@ export class User extends NamedEntity {
   @ManyToMany(() => Job, (job) => job.users, { nullable: true })
   jobs: Job[];
 
+  @ManyToMany(() => Job, (job) => job.userJobs, { nullable: true })
+  @JoinTable({
+    name: 'savedjob',
+    joinColumn: {
+      name: 'userid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'jobid',
+      referencedColumnName: 'id',
+    },
+  })
+  savedJobs: Job[];
+
   @OneToMany(() => Job, (job) => job.createdBy, {
     eager: false,
   })

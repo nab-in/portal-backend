@@ -59,6 +59,10 @@ export class Job extends NamedEntity {
   @JoinTable({ name: 'userjobs' })
   users: User[];
 
+  @ManyToMany(() => User, (user) => user.savedJobs, { nullable: true })
+  @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
+  userJobs: User[];
+
   @ManyToMany(() => JobCategory, (categories) => categories.jobs, {
     nullable: true,
   })
