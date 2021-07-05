@@ -160,29 +160,29 @@ export class UserController extends BaseController<User> {
       ),
     };
   }
-  @Post('belongstocompany')
+  @Get('belongstocompany')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   async belongCompany(
     @Res() res: any,
-    @Body() body: any,
+    @Query() query: any,
     @Req() req: any,
   ): Promise<any> {
-    if (body.company) {
-      const company = await this.service.findCompany(body.company);
+    if (query.company) {
+      const company = await this.service.findCompany(query.company);
       if (company) {
         const user: User = await this.service.findOneByUid(req.user.id);
-        const Belongs = await this.service.belongToCompany(user, body.company);
+        const Belongs = await this.service.belongToCompany(user, query.company);
         if (Belongs) {
           return getSuccessResponse(res, resolveResponse(Belongs));
         } else {
           return res.status(HttpStatus.NOT_FOUND).send({
-            error: `There was no company with id ${body.company} in the system`,
+            error: `There was no company with id ${query.company} in the system`,
           });
         }
       } else {
         return res.status(HttpStatus.NOT_FOUND).send({
-          error: `A company with id ${body.company} is not available in the system`,
+          error: `A company with id ${query.company} is not available in the system`,
         });
       }
     } else {
