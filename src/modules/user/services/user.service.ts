@@ -35,6 +35,21 @@ export class UserService extends BaseService<User> {
     return [jobs, total];
   }
 
+  async findSavedJobs({ user, page, size }): Promise<any> {
+    let query = `SELECT JOBID FROM SAVEDJOBS WHERE USERID=${user.id}`;
+    let appliedJobs = (await this.repository.manager.query(query)).map(
+      (job: { jobId: any }) => job.jobId,
+    );
+    const [jobs, total] = await this.jobrepository.findAndCount({
+      where: {
+        id: In(appliedJobs),
+      },
+      skip: page * size,
+      take: size,
+    });
+    return [jobs, total];
+  }
+
   async createdJobs({ user, page, size }): Promise<any> {
     const [jobs, total] = await this.jobrepository.findAndCount({
       where: {
