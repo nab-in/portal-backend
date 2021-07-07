@@ -89,6 +89,47 @@ export class UserController extends BaseController<User> {
     };
     return res.status(HttpStatus.OK).send(response);
   }
+  @Get('savedJobs')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async savedjobs(
+    @Res() res: any,
+    @Req() req: any,
+    @Query() query: any,
+  ): Promise<any> {
+    const pagerDetails: any = getPagerDetails(query);
+
+    const user = await this.service.findOneByUid(req.user.id);
+    const [jobs, total] = await this.service.findSavedJobs({
+      user,
+      size: pagerDetails.pageSize,
+      page: pagerDetails.page - 1,
+    });
+    delete pagerDetails.nextPage;
+    const pager = {
+      ...pagerDetails,
+      pageCount: jobs.length,
+      total,
+    };
+    if (Math.ceil(total / pager.pageSize) > pager.page) {
+      pager['nextPage'] = `/api/${User.plural}/savedJobs?page=${
+        +pagerDetails.page + +'1'
+      }`;
+    }
+    if (
+      Math.ceil(total / pager.pageSize) < pager.page &&
+      total > pager.pageSize
+    ) {
+      pager['previousPage'] = `/api/${User.plural}/savedJobs?page=${
+        +pagerDetails.page + +'1'
+      }`;
+    }
+    const response = {
+      pager,
+      jobs: jobs.map((job) => resolveResponse(job)),
+    };
+    return res.status(HttpStatus.OK).send(response);
+  }
   @Get('createdJobs')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
