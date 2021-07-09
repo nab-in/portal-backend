@@ -65,4 +65,11 @@ export class AuthService {
       throw new InternalServerErrorException(e.message);
     }
   }
+  async userInfo(uid: string): Promise<User> {
+    const user = await this.userrepository.findOne({
+      where: { uid },
+      relations: ['company'],
+    });
+    return user;
+  }
 }
