@@ -46,6 +46,7 @@ export class AuthController {
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
   async getUser(@Req() req: any, @Res() res: any): Promise<any> {
-    return res.status(HttpStatus.OK).send(resolveResponse(req.user));
+    const user = await this.authService.userInfo(req.user.id);
+    return res.status(HttpStatus.OK).send(resolveResponse(user));
   }
 }
