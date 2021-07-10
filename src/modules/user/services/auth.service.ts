@@ -9,6 +9,10 @@ import { Job } from '../../job/entities/job.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import jwt_decode from 'jwt-decode';
+import {
+  getRelations,
+  getSelections,
+} from '../../../core/helpers/get-fields.utility';
 
 @Injectable()
 export class AuthService {
@@ -65,11 +69,12 @@ export class AuthService {
       throw new InternalServerErrorException(e.message);
     }
   }
-  async userInfo(uid: string): Promise<User> {
-    const user = await this.userrepository.findOne({
+  async userInfo(uid: string, fields?: any): Promise<User> {
+    const metaData = this.userrepository.manager.connection.getMetadata(User);
+    return await this.userrepository.findOne({
       where: { uid },
-      relations: ['company'],
+      select: getSelections(fields, metaData),
+      relations: getRelations(fields, metaData),
     });
-    return user;
   }
 }
