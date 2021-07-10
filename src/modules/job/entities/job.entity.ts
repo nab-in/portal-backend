@@ -29,7 +29,7 @@ export class Job extends NamedEntity {
   @Column('varchar', {
     nullable: true,
     name: 'email',
-    unique: true,
+    unique: false,
   })
   email: string;
 

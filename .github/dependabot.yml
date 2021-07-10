@@ -10,7 +10,6 @@ updates:
       - "dependencies"
     reviewers:
       - "BaharaJr"
-      - "erickmgongo"
     commit-message:
       prefix: "npm dev"
       prefix-development: "dev"
