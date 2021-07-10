@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UseFilters,
@@ -45,8 +46,12 @@ export class AuthController {
   @Get('me')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
-  async getUser(@Req() req: any, @Res() res: any): Promise<any> {
-    const user = await this.authService.userInfo(req.user.id);
+  async getUser(
+    @Req() req: any,
+    @Res() res: any,
+    @Query() query: any,
+  ): Promise<any> {
+    const user = await this.authService.userInfo(req.user.id, query.fields);
     return res.status(HttpStatus.OK).send(resolveResponse(user));
   }
 }
