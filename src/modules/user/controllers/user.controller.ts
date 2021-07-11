@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -250,5 +251,17 @@ export class UserController extends BaseController<User> {
         message: `Item with identifier ${params.id} could not be found`,
       });
     }
+  }
+  @Put('passwordupdate')
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  async changePassword(
+    @Body() body: any,
+    @Req() req: any,
+    @Res() res: any,
+  ): Promise<any> {
+    const user = await this.service.findOneByUid(req.user.id);
+    const changedPassword = await this.service.changePassword(user, body);
+    return res.status(HttpStatus.OK).send(resolveResponse(changedPassword));
   }
 }
