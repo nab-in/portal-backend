@@ -14,10 +14,10 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { query } from 'express';
-import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
-import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
 import { BaseController } from '../../../core/controllers/base.controller';
+import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
+import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
 import {
   genericFailureResponse,
   getSuccessResponse,
@@ -263,5 +263,34 @@ export class UserController extends BaseController<User> {
     const user = await this.service.findOneByUid(req.user.id);
     const changedPassword = await this.service.changePassword(user, body);
     return res.status(HttpStatus.OK).send(resolveResponse(changedPassword));
+  }
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  async updateUser(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() params,
+    @Body() updateEntityDto,
+  ): Promise<User> {
+    const updateEntity = await this.service.findOneByUid(params.id);
+    const verifyOldPassword = await User.validatePassword(
+      updateEntityDto.userpassword,
+      updateEntity.salt,
+      updateEntity.password,
+    );
+    if (updateEntity !== undefined && verifyOldPassword) {
+      updateEntityDto['id'] = updateEntity['id'];
+      const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+        updateEntityDto,
+        'PUT',
+      );
+      await this.service.update(resolvedEntityDTO);
+      const data = await this.service.findOneByUid(params.id);
+      return res.status(HttpStatus.OK).send({
+        message: `Item with id ${params.id} updated successfully.`,
+        payload: resolveResponse(data),
+      });
+    }
   }
 }
