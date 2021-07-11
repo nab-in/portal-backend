@@ -82,4 +82,27 @@ export class UserService extends BaseService<User> {
     const job = await this.jobrepository.findOne({ uid });
     return job;
   }
+  async changePassword(
+    user: User,
+    body: { oldPassword: any; newPassword: any },
+  ): Promise<any> {
+    try {
+      const verifyOldPassword = await User.validatePassword(
+        body.oldPassword,
+        user.salt,
+        user.password,
+      );
+      if (verifyOldPassword) {
+        user.password = body.newPassword;
+        await this.repository.save(user);
+        return {
+          message: `Your Password has been changed successfully`,
+        };
+      } else {
+        throw new Error('Your old password is incorrect');
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
 }
