@@ -274,23 +274,41 @@ export class UserController extends BaseController<User> {
     @Body() updateEntityDto,
   ): Promise<User> {
     const updateEntity = await this.service.findOneByUid(params.id);
-    const verifyOldPassword = await User.validatePassword(
-      updateEntityDto.userpassword,
-      updateEntity.salt,
-      updateEntity.password,
-    );
-    if (updateEntity !== undefined && verifyOldPassword) {
-      updateEntityDto['id'] = updateEntity['id'];
-      const resolvedEntityDTO: any = await this.service.EntityUidResolver(
-        updateEntityDto,
-        'PUT',
-      );
-      await this.service.update(resolvedEntityDTO);
-      const data = await this.service.findOneByUid(params.id);
-      return res.status(HttpStatus.OK).send({
-        message: `Item with id ${params.id} updated successfully.`,
-        payload: resolveResponse(data),
-      });
+    if (updateEntity !== undefined) {
+      if (updateEntityDto.email || updateEntityDto.username) {
+        const verifyOldPassword = await User.validatePassword(
+          updateEntityDto.userpassword,
+          updateEntity.salt,
+          updateEntity.password,
+        );
+        if (verifyOldPassword) {
+          updateEntityDto['id'] = updateEntity['id'];
+          const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+            updateEntityDto,
+            'PUT',
+          );
+          await this.service.update(resolvedEntityDTO);
+          const data = await this.service.findOneByUid(params.id);
+          return res.status(HttpStatus.OK).send({
+            message: `Item with id ${params.id} updated successfully.`,
+            payload: resolveResponse(data),
+          });
+        }
+      }
+
+      if (!updateEntityDto.email && !updateEntityDto.username) {
+        updateEntityDto['id'] = updateEntity['id'];
+        const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+          updateEntityDto,
+          'PUT',
+        );
+        await this.service.update(resolvedEntityDTO);
+        const data = await this.service.findOneByUid(params.id);
+        return res.status(HttpStatus.OK).send({
+          message: `Item with id ${params.id} updated successfully.`,
+          payload: resolveResponse(data),
+        });
+      }
     }
   }
 }
