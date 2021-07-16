@@ -18,6 +18,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { getConfiguration } from '../../../core/utilities/systemConfigs';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
@@ -62,7 +63,7 @@ export class JobController extends BaseController<Job> {
   @UseInterceptors(
     FileInterceptor('attachment', {
       storage: diskStorage({
-        destination: 'src/files',
+        destination: getConfiguration().job,
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
@@ -114,7 +115,7 @@ export class JobController extends BaseController<Job> {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: 'src/files',
+        destination: getConfiguration().job,
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
@@ -142,7 +143,7 @@ export class JobController extends BaseController<Job> {
   @UseInterceptors(
     FilesInterceptor('image', 20, {
       storage: diskStorage({
-        destination: 'src/files',
+        destination: getConfiguration().job,
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
@@ -160,7 +161,7 @@ export class JobController extends BaseController<Job> {
   }
   @Get(':imgpath/attachment')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: 'src/files' });
+    return res.sendFile(image, { root: getConfiguration().job });
   }
   @Post(':job/save')
   @UseFilters(new HttpErrorFilter())

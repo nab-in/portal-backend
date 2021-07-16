@@ -4,11 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HttpErrorFilter } from './core/interceptors/error.filter';
+import { getDataBaseConfiguration } from './core/utilities/systemConfigs';
 import { modules } from './modules/modules.export';
 
 @Module({
   // imported modules definition
-  imports: [...modules, TypeOrmModule.forRoot()],
+  imports: [...modules, TypeOrmModule.forRoot(getDataBaseConfiguration())],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],
 })
