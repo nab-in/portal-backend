@@ -8,7 +8,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
-  OneToMany
+  OneToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
@@ -112,9 +112,19 @@ export class User extends NamedEntity {
   })
   enabled: boolean;
 
-  @ManyToOne(() => Company, (company) => company.users)
-  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
-  company: Company;
+  @ManyToMany(() => Company, (companies) => companies.users)
+  @JoinTable({
+    name: 'usercompanies',
+    joinColumn: {
+      name: 'userid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'companyid',
+      referencedColumnName: 'id',
+    },
+  })
+  companies: Company[];
 
   @ManyToMany(() => Job, (job) => job.users, { nullable: true })
   jobs: Job[];

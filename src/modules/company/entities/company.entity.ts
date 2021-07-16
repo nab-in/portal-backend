@@ -9,6 +9,7 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 @Entity('company', { schema: 'public' })
@@ -65,9 +66,8 @@ export class Company extends NamedEntity {
   })
   jobs: Job[];
 
-  @OneToMany(() => User, (users) => users.company, {
-    cascade: true,
-  })
+  @ManyToMany(() => User, (users) => users.companies, { nullable: true })
+  @JoinColumn({ name: 'usercompanies', referencedColumnName: 'id' })
   users: User[];
 
   @ManyToOne(() => User, (user) => user.createdCompanies, { nullable: false })
