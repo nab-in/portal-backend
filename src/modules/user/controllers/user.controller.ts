@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { query } from 'express';
+import { Company } from '../../company/entities/company.entity';
 import { BaseController } from '../../../core/controllers/base.controller';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
@@ -212,10 +213,10 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ): Promise<any> {
     if (query.company) {
-      const company = await this.service.findCompany(query.company);
+      const company: Company = await this.service.findCompany(query.company);
       if (company) {
         const user: User = await this.service.findOneByUid(req.user.id);
-        const Belongs = await this.service.belongToCompany(user, query.company);
+        const Belongs = await this.service.belongToCompany(user, company);
         if (Belongs) {
           return getSuccessResponse(res, resolveResponse(Belongs));
         } else {

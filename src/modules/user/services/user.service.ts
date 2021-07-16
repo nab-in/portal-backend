@@ -63,11 +63,10 @@ export class UserService extends BaseService<User> {
 
   async belongToCompany(
     user: User,
-    uid: string,
+    company: Company,
   ): Promise<{ message: string | boolean }> {
-    const userCompany = await this.companyrepository.find({
-      where: { createdBy: user, uid },
-    });
+    const query = `SELECT * FROM USERCOMPANIES WHERE USERID=${user.id} AND COMPANYID=${company.id}`;
+    const userCompany = await this.companyrepository.manager.query(query);
     if (userCompany.length > 0) {
       return { message: true };
     } else {
