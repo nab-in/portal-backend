@@ -40,4 +40,4 @@ ormconfig.json
 docker-compose.yml
 
 #ignore image files
-src/files
+files
