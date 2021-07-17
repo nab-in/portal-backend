@@ -13,6 +13,16 @@ if (!pathFolder) {
   }
   pathFolder = __dirname.split('./files').join('');
 }
+if (!fs.existsSync('./files')) {
+  fs.mkdirSync('./files');
+  fs.mkdirSync('./files/profile');
+}
+if (!fs.existsSync('./files/config.json')) {
+  fs.writeFileSync(
+    './files/config.json',
+    fs.readFileSync('./systemconfig.example.json'),
+  );
+}
 const config = JSON.parse(fs.readFileSync('./files/config.json', 'utf8'));
 
 export function getDataBaseConfiguration() {
