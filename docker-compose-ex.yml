@@ -24,6 +24,8 @@ services:
     image: portal/api
     container_name: portal-api
     build: .
+    environment:
+      - PORTAL=/home/app/files
     restart: always
     depends_on:
       - db
@@ -31,6 +33,7 @@ services:
     command: npm run start:dev
     volumes:
       - ./src:/home/app/src
+      - ./files:/home/app/files
       - ./dist:/home/app/dist
 volumes:
   postdb-data:
