@@ -1,11 +1,12 @@
+import { Logger } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as Compression from 'compression';
 import * as express from 'express';
 import * as Helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpErrorFilter } from './core/interceptors/error.filter';
 import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
+import { getConfiguration } from './core/utilities/systemConfigs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,15 +23,16 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggingInterceptor());
 
   app.use(Compression());
-  const config = new DocumentBuilder()
+  /* const config = new DocumentBuilder()
     .setTitle('Portal Backend')
     .setDescription('All Portal API backend endpoints')
     .setVersion('1.0')
     .addTag('Job Portal')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document);*/
 
-  await app.listen(7000);
+  await app.listen(await getConfiguration().port);
+  Logger.log('App listening on Port ', await app.getUrl());
 }
 bootstrap();

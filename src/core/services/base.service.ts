@@ -98,6 +98,14 @@ export class BaseService<T extends PortalCoreEntity> {
     const savedEntity = await this.modelRepository.findOne({
       where: { uid: model.uid },
     });
+
+    /*
+     * Associate user with company they created
+     */
+    if (this.Model.plural === 'companies') {
+      const query = `INSERT INTO USERCOMPANIES(USERID,COMPANYID) VALUES(${entity.createdBy.id}, ${savedEntity['id']})`;
+      await this.modelRepository.manager.query(query);
+    }
     return savedEntity;
   }
   async updateByUID(uid: string, model: any): Promise<UpdateResult> {

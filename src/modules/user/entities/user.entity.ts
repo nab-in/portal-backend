@@ -1,6 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from '../../userrole/entities/userrole.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -16,6 +14,7 @@ import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
 import { Company } from '../../company/entities/company.entity';
 import { Job } from '../../job/entities/job.entity';
+import { UserRole } from '../../userrole/entities/userrole.entity';
 
 @Entity('user', { schema: 'public' })
 export class User extends NamedEntity {
@@ -25,7 +24,6 @@ export class User extends NamedEntity {
     nullable: false,
     name: 'firstname',
   })
-  @ApiProperty()
   firstname: string;
 
   @Column('varchar', {
@@ -114,9 +112,19 @@ export class User extends NamedEntity {
   })
   enabled: boolean;
 
-  @ManyToOne(() => Company, (company) => company.users)
-  @JoinColumn({ name: 'companyid', referencedColumnName: 'id' })
-  company: Company;
+  @ManyToMany(() => Company, (companies) => companies.users)
+  @JoinTable({
+    name: 'usercompanies',
+    joinColumn: {
+      name: 'userid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'companyid',
+      referencedColumnName: 'id',
+    },
+  })
+  companies: Company[];
 
   @ManyToMany(() => Job, (job) => job.users, { nullable: true })
   jobs: Job[];

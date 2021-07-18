@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -13,10 +14,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { query } from 'express';
-import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
-import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
+import { Company } from '../../company/entities/company.entity';
 import { BaseController } from '../../../core/controllers/base.controller';
+import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
+import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
 import {
   genericFailureResponse,
   getSuccessResponse,
@@ -211,10 +213,10 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ): Promise<any> {
     if (query.company) {
-      const company = await this.service.findCompany(query.company);
+      const company: Company = await this.service.findCompany(query.company);
       if (company) {
         const user: User = await this.service.findOneByUid(req.user.id);
-        const Belongs = await this.service.belongToCompany(user, query.company);
+        const Belongs = await this.service.belongToCompany(user, company);
         if (Belongs) {
           return getSuccessResponse(res, resolveResponse(Belongs));
         } else {
@@ -249,6 +251,65 @@ export class UserController extends BaseController<User> {
       return res.status(HttpStatus.NOT_FOUND).send({
         message: `Item with identifier ${params.id} could not be found`,
       });
+    }
+  }
+  @Put('passwordupdate')
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  async changePassword(
+    @Body() body: any,
+    @Req() req: any,
+    @Res() res: any,
+  ): Promise<any> {
+    const user = await this.service.findOneByUid(req.user.id);
+    const changedPassword = await this.service.changePassword(user, body);
+    return res.status(HttpStatus.OK).send(resolveResponse(changedPassword));
+  }
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  async updateUser(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() params,
+    @Body() updateEntityDto,
+  ): Promise<User> {
+    const updateEntity = await this.service.findOneByUid(params.id);
+    if (updateEntity !== undefined) {
+      if (updateEntityDto.email || updateEntityDto.username) {
+        const verifyOldPassword = await User.validatePassword(
+          updateEntityDto.userpassword,
+          updateEntity.salt,
+          updateEntity.password,
+        );
+        if (verifyOldPassword) {
+          updateEntityDto['id'] = updateEntity['id'];
+          const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+            updateEntityDto,
+            'PUT',
+          );
+          await this.service.update(resolvedEntityDTO);
+          const data = await this.service.findOneByUid(params.id);
+          return res.status(HttpStatus.OK).send({
+            message: `Item with id ${params.id} updated successfully.`,
+            payload: resolveResponse(data),
+          });
+        }
+      }
+
+      if (!updateEntityDto.email && !updateEntityDto.username) {
+        updateEntityDto['id'] = updateEntity['id'];
+        const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+          updateEntityDto,
+          'PUT',
+        );
+        await this.service.update(resolvedEntityDTO);
+        const data = await this.service.findOneByUid(params.id);
+        return res.status(HttpStatus.OK).send({
+          message: `Item with id ${params.id} updated successfully.`,
+          payload: resolveResponse(data),
+        });
+      }
     }
   }
 }

@@ -63,11 +63,10 @@ export class UserService extends BaseService<User> {
 
   async belongToCompany(
     user: User,
-    uid: string,
+    company: Company,
   ): Promise<{ message: string | boolean }> {
-    const userCompany = await this.companyrepository.find({
-      where: { createdBy: user, uid },
-    });
+    const query = `SELECT * FROM USERCOMPANIES WHERE USERID=${user.id} AND COMPANYID=${company.id}`;
+    const userCompany = await this.companyrepository.manager.query(query);
     if (userCompany.length > 0) {
       return { message: true };
     } else {
@@ -81,5 +80,28 @@ export class UserService extends BaseService<User> {
   async findJob(uid: string): Promise<Job> {
     const job = await this.jobrepository.findOne({ uid });
     return job;
+  }
+  async changePassword(
+    user: User,
+    body: { oldPassword: any; newPassword: any },
+  ): Promise<any> {
+    try {
+      const verifyOldPassword = await User.validatePassword(
+        body.oldPassword,
+        user.salt,
+        user.password,
+      );
+      if (verifyOldPassword) {
+        user.password = body.newPassword;
+        await this.repository.save(user);
+        return {
+          message: `Your Password has been changed successfully`,
+        };
+      } else {
+        throw new Error('Your old password is incorrect');
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
   }
 }
