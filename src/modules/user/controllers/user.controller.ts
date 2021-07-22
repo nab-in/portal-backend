@@ -3,19 +3,28 @@ import {
   Controller,
   Get,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Req,
   Res,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { query } from 'express';
-import { Company } from '../../company/entities/company.entity';
+import fs from 'fs';
+import { diskStorage } from 'multer';
 import { BaseController } from '../../../core/controllers/base.controller';
+import {
+  editFileName,
+  imageFileFilter,
+} from '../../../core/helpers/sanitize-image';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
@@ -24,6 +33,8 @@ import {
   getSuccessResponse,
   postSuccessResponse,
 } from '../../../core/utilities/response.helper';
+import { getConfiguration } from '../../../core/utilities/systemConfigs';
+import { Company } from '../../company/entities/company.entity';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 
@@ -50,6 +61,42 @@ export class UserController extends BaseController<User> {
     }
   }
 
+  @Post('dp')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: getConfiguration().user,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedFile(
+    @UploadedFile() file: any,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    try {
+      const response = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+      const user: User = await this.service.findOneByUid(req.user.id);
+      if (user.id) {
+        user.dp =
+          getConfiguration().serverurl + '/api/users/' + file.filename + '/dp';
+        await this.service.update(user);
+        return response;
+      } else {
+        throw new NotFoundException(
+          `User with ID ${user.id} could not be found`,
+        );
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
   @Get('appliedJobs')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
@@ -311,5 +358,9 @@ export class UserController extends BaseController<User> {
         });
       }
     }
+  }
+  @Get(':imgpath/dp')
+  seeUploadedFile(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: getConfiguration().user });
   }
 }
