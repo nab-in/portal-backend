@@ -36,6 +36,9 @@ export function getConfiguration() {
   if (!config.port) {
     config.port = config.serverport;
   }
+  if (!config.serverurl) {
+    config.serverurl = config.serverurl;
+  }
   if (!files.profile) {
     files.profile = pathFolder + '/' + 'profile';
   }
