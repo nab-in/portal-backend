@@ -82,7 +82,8 @@ export class JobController extends BaseController<Job> {
       'POST',
     );
     if (file && file.name) {
-      resolvedEntity['attachment'] = '/api/' + file.filename + '/attachment';
+      resolvedEntity['attachment'] =
+        getConfiguration().serverurl + '/api/' + file.filename + '/attachment';
     }
 
     const createdEntity = await this.service.create(resolvedEntity);
@@ -121,7 +122,7 @@ export class JobController extends BaseController<Job> {
       fileFilter: imageFileFilter,
     }),
   )
-  async uploadedFile(@UploadedFile() file, @Req() req, @Body() body: any) {
+  async uploadedFile(@UploadedFile() file: any, @Body() body: any) {
     const job = await this.service.findOneByUid(body.job);
     const response = {
       originalname: file.originalname,
