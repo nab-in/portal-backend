@@ -39,6 +39,9 @@ export function getConfiguration() {
   if (!config.serverurl) {
     config.serverurl = config.serverurl;
   }
+  if (!config.email) {
+    config.email = config.email;
+  }
   if (!files.profile) {
     files.profile = pathFolder + '/' + 'profile';
   }
