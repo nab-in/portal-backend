@@ -78,17 +78,15 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ) {
     try {
+      const path: string =
+        getConfiguration().serverurl + '/api/users/' + file.filename + '/dp';
       const response = {
-        originalname: file.originalname,
-        filename: file.filename,
+        path,
+        message: 'Profile picture saved successfully',
       };
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
-        user.dp =
-          getConfiguration().serverurl +
-          '/api/users/' +
-          file.filename +
-          '/attachment';
+        user.dp = path;
         await this.service.update(user);
         return response;
       } else {
@@ -118,9 +116,11 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ) {
     try {
+      const path: string =
+        getConfiguration().serverurl + '/api/users/' + file.filename + '/cv';
       const response = {
-        originalname: file.originalname,
-        filename: file.filename,
+        path,
+        message: 'CV saved successfully',
       };
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
@@ -402,8 +402,13 @@ export class UserController extends BaseController<User> {
       }
     }
   }
-  @Get(':imgpath/attachment')
-  seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: getConfiguration().user });
+  @Get(':imgpath/dp')
+  seedp(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: getConfiguration().dp });
+  }
+
+  @Get(':imgpath/cv')
+  seecv(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: getConfiguration().dp });
   }
 }

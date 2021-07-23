@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { getConfiguration } from 'src/core/utilities/systemConfigs';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -168,6 +169,7 @@ export class User extends NamedEntity {
 
   @BeforeInsert()
   async beforeUpdateTransaction() {
+    this.dp = this.dp || getConfiguration().serverurl + '/api/users/dp.png/dp';
     this.verified = false;
     this.enabled = true;
     this.created = new Date();
