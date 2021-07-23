@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../modules/user/entities/user.entity';
+import * as nodemailer from 'nodemailer';
 import { FindConditions, Repository, UpdateResult } from 'typeorm';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { getRelations, getSelections } from '../helpers/get-fields.utility';
 import { getWhereConditions } from '../helpers/get-where-conditions.utility';
 import { resolvedResponse } from '../helpers/resolve.payload';
 import { resolveWhere } from '../helpers/resolvewhere';
+import { newaccount } from '../helpers/templates/new-account';
+import { getConfiguration } from '../utilities/systemConfigs';
 
 @Injectable()
 export class BaseService<T extends PortalCoreEntity> {
@@ -106,6 +108,35 @@ export class BaseService<T extends PortalCoreEntity> {
       const query = `INSERT INTO USERCOMPANIES(USERID,COMPANYID) VALUES(${entity.createdBy.id}, ${savedEntity['id']})`;
       await this.modelRepository.manager.query(query);
     }
+    /*
+     * Send user email to verify themselves
+     */
+    if (this.Model.plural === 'users' && entity.email) {
+      const auth = getConfiguration().email.auth;
+      const transport = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        requireTLS: true,
+        auth,
+      });
+      const message = {
+        from: `Job Portal <${auth.user}> `,
+        to: `"${savedEntity['firstname']}" <${savedEntity['email']}>`,
+        subject: 'New Job Portal Account',
+        text: `Hello ${savedEntity['firstname']}.`,
+        html: `${newaccount(savedEntity, 'url')}`,
+      };
+      transport.sendMail(message, function (error) {
+        if (error) {
+          console.log('ERROR', error.message);
+          return error.message;
+        } else {
+          return true;
+        }
+      });
+    }
+
     return savedEntity;
   }
   async updateByUID(uid: string, model: any): Promise<UpdateResult> {
