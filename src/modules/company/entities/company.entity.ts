@@ -12,6 +12,8 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
+import { getConfiguration } from '../../../core/utilities/systemConfigs';
+
 @Entity('company', { schema: 'public' })
 export class Company extends NamedEntity {
   static plural = 'companies';
@@ -80,6 +82,9 @@ export class Company extends NamedEntity {
 
   @BeforeInsert()
   beforeUpdateTransaction() {
+    this.logo =
+      this.logo ||
+      `${getConfiguration().serverurl}/api/companies/logo.png/logo`;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();

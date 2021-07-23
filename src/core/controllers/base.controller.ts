@@ -27,6 +27,7 @@ import {
   getSuccessResponse,
   postSuccessResponse,
 } from '../utilities/response.helper';
+import { getConfiguration } from '../utilities/systemConfigs';
 
 export class BaseController<T extends PortalCoreEntity> {
   constructor(
@@ -157,5 +158,9 @@ export class BaseController<T extends PortalCoreEntity> {
     } else {
       return genericFailureResponse(res, params);
     }
+  }
+  @Get(':imgpath/logo')
+  sendcompanylogo(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: getConfiguration().company });
   }
 }
