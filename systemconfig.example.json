@@ -37,5 +37,6 @@
   "job": "./files/profile/job",
   "cv": "./files/profile/user/cv",
   "dp": "./files/profile/user/dp",
-  "company": "./files/profile/company"
+  "company": "./files/profile/company",
+  "serverurl": "http://localhost:5000"
 }
