@@ -64,9 +64,9 @@ export class UserController extends BaseController<User> {
   @Post('dp')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor('', {
       storage: diskStorage({
-        destination: getConfiguration().user,
+        destination: getConfiguration().dp,
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
@@ -85,7 +85,50 @@ export class UserController extends BaseController<User> {
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
         user.dp =
-          getConfiguration().serverurl + '/api/users/' + file.filename + '/dp';
+          getConfiguration().serverurl +
+          '/api/users/' +
+          file.filename +
+          '/attachment';
+        await this.service.update(user);
+        return response;
+      } else {
+        throw new NotFoundException(
+          `User with ID ${user.id} could not be found`,
+        );
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  @Post('cv')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FileInterceptor('', {
+      storage: diskStorage({
+        destination: getConfiguration().cv,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedCv(
+    @UploadedFile() file: any,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    try {
+      const response = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+      const user: User = await this.service.findOneByUid(req.user.id);
+      if (user.id) {
+        user.cv =
+          getConfiguration().serverurl +
+          '/api/users/' +
+          file.filename +
+          '/attachment';
         await this.service.update(user);
         return response;
       } else {
@@ -359,7 +402,7 @@ export class UserController extends BaseController<User> {
       }
     }
   }
-  @Get(':imgpath/dp')
+  @Get(':imgpath/attachment')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: getConfiguration().user });
   }

@@ -60,10 +60,30 @@ export function getConfiguration() {
   if (!files.company) {
     files.company = config.company;
   }
-  if (!fs.existsSync(config.company)) {
-    fs.mkdirSync(config.company);
+  if (!fs.existsSync(config.cv)) {
+    fs.mkdirSync(config.cv);
   }
-
+  if (!files.cv) {
+    files.cv = config.cv;
+  }
+  if (!fs.existsSync(config.dp)) {
+    fs.mkdirSync(config.dp);
+  }
+  if (!files.dp) {
+    files.dp = config.dp;
+  }
+  if (!fs.existsSync('./files/profile/user/dp/dp.png')) {
+    fs.writeFileSync(
+      './files/profile/user/dp/dp.png',
+      fs.readFileSync('./dp.png'),
+    );
+  }
+  if (!fs.existsSync('./files/profile/company/logo.png')) {
+    fs.writeFileSync(
+      './files/profile/company/logo.png',
+      fs.readFileSync('./logo.png'),
+    );
+  }
   return {
     ...config,
     ...files,

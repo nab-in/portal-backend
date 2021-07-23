@@ -111,10 +111,10 @@ export class JobController extends BaseController<Job> {
     }
   }
 
-  @Post('upload')
+  @Post('profile')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor('', {
       storage: diskStorage({
         destination: getConfiguration().job,
         filename: editFileName,
@@ -139,10 +139,10 @@ export class JobController extends BaseController<Job> {
     }
   }
 
-  @Post('multiple')
+  @Post('profiles')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
-    FilesInterceptor('image', 20, {
+    FilesInterceptor('', 20, {
       storage: diskStorage({
         destination: getConfiguration().job,
         filename: editFileName,

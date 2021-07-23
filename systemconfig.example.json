@@ -25,8 +25,17 @@
       "subscribersDir": "src/subscriber"
     }
   },
+  "email": {
+    "auth": {
+      "username": "<email>",
+      "password": "<password>"
+    },
+    "smtp": "smtp.gmail.com"
+  },
   "serverport": 7000,
   "user": "./files/profile/user",
   "job": "./files/profile/job",
+  "cv": "./files/profile/user/cv",
+  "dp": "./files/profile/user/dp",
   "company": "./files/profile/company"
 }

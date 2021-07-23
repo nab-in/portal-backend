@@ -5,7 +5,7 @@ ENV TZ Africa/Dar_es_Salaam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN mkdir /home/app
 WORKDIR /home/app
-COPY ["package.json", "tsconfig.json", "tsconfig.build.json","./"]
+COPY ["package.json", "tsconfig.json", "tsconfig.build.json","logo.png","systemconfig.example.json","dp.png","./"]
 RUN npm install && apk del .gyp
 COPY ["src","./src"]
 RUN npm run build
