@@ -44,7 +44,11 @@ export const resolveResponse: any = (responseObject: any) => {
           }
         }
       } else {
-        if (attributeKey === 'dp' || attributeKey === 'logo') {
+        if (
+          attributeKey === 'dp' ||
+          attributeKey === 'logo' ||
+          attributeKey === 'cv'
+        ) {
           newResponseObject[attributeKey] =
             getConfiguration().serverurl + attributeValue;
         } else {
