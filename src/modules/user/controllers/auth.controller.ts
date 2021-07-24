@@ -37,6 +37,7 @@ export class AuthController {
   }
   @Get('logout')
   @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
   async logout(@Req() request: any, @Res() res: any): Promise<any> {
     request.user = null;
     return res
