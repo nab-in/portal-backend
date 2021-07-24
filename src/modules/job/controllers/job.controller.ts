@@ -22,6 +22,7 @@ import { getConfiguration } from '../../../core/utilities/systemConfigs';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
+  filesFilter,
   imageFileFilter,
 } from '../../../core/helpers/sanitize-image';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
@@ -147,7 +148,7 @@ export class JobController extends BaseController<Job> {
         destination: getConfiguration().job,
         filename: editFileName,
       }),
-      fileFilter: imageFileFilter,
+      fileFilter: filesFilter,
     }),
   )
   async uploadMultipleFiles(@UploadedFiles() files) {
