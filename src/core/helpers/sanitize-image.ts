@@ -3,20 +3,14 @@ import { generateUid } from './makeuid.helper';
 
 export const imageFileFilter = (req, file, callback) => {
   if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-    return callback(
-      new Error('Only image or documents are allowed files are allowed!'),
-      false,
-    );
+    return callback(new Error('Only image files are allowed!'), false);
   }
   callback(null, true);
 };
 
 export const filesFilter = (req, file, callback) => {
   if (!file.originalname.match(/\.(pdf)$/)) {
-    return callback(
-      new Error('Only image or documents are allowed files are allowed!'),
-      false,
-    );
+    return callback(new Error('Only document/PDF files are allowed!'), false);
   }
   callback(null, true);
 };
