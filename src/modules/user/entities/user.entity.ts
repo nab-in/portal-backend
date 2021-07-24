@@ -1,14 +1,11 @@
 import * as bcrypt from 'bcrypt';
-import { getConfiguration } from 'src/core/utilities/systemConfigs';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
   OneToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
@@ -169,7 +166,7 @@ export class User extends NamedEntity {
 
   @BeforeInsert()
   async beforeUpdateTransaction() {
-    this.dp = this.dp || getConfiguration().serverurl + '/api/users/dp.png/dp';
+    this.dp = this.dp || '/api/users/dp.png/dp';
     this.verified = false;
     this.enabled = true;
     this.created = new Date();

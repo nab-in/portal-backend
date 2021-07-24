@@ -1,3 +1,5 @@
+import { getConfiguration } from '../utilities/systemConfigs';
+
 export const resolveResponse: any = (responseObject: any) => {
   const omit = (
     responseObject: { [x: string]: any },
@@ -42,7 +44,12 @@ export const resolveResponse: any = (responseObject: any) => {
           }
         }
       } else {
-        newResponseObject[attributeKey] = attributeValue;
+        if (attributeKey === 'dp' || attributeKey === 'logo') {
+          newResponseObject[attributeKey] =
+            getConfiguration().serverurl + attributeValue;
+        } else {
+          newResponseObject[attributeKey] = attributeValue;
+        }
       }
     }
   });

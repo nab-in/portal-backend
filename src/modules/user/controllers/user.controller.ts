@@ -18,7 +18,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { query } from 'express';
-import fs from 'fs';
 import { diskStorage } from 'multer';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
@@ -78,8 +77,7 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ) {
     try {
-      const path: string =
-        getConfiguration().serverurl + '/api/users/' + file.filename + '/dp';
+      const path: string = '/api/users/' + file.filename + '/dp';
       const response = {
         path,
         message: 'Profile picture saved successfully',
@@ -116,19 +114,14 @@ export class UserController extends BaseController<User> {
     @Req() req: any,
   ) {
     try {
-      const path: string =
-        getConfiguration().serverurl + '/api/users/' + file.filename + '/cv';
+      const path: string = '/api/users/' + file.filename + '/cv';
       const response = {
         path,
         message: 'CV saved successfully',
       };
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
-        user.cv =
-          getConfiguration().serverurl +
-          '/api/users/' +
-          file.filename +
-          '/attachment';
+        user.cv = path;
         await this.service.update(user);
         return response;
       } else {

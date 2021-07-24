@@ -2,17 +2,16 @@ import { generateUid } from 'src/core/helpers/makeuid.helper';
 import { Job } from 'src/modules/job/entities/job.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
-  JoinColumn,
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
-  ManyToMany,
 } from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
-import { getConfiguration } from '../../../core/utilities/systemConfigs';
 
 @Entity('company', { schema: 'public' })
 export class Company extends NamedEntity {
@@ -82,9 +81,7 @@ export class Company extends NamedEntity {
 
   @BeforeInsert()
   beforeUpdateTransaction() {
-    this.logo =
-      this.logo ||
-      `${getConfiguration().serverurl}/api/companies/logo.png/logo`;
+    this.logo = this.logo || `/api/companies/logo.png/logo`;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
