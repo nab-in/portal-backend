@@ -33,6 +33,13 @@ export class Job extends NamedEntity {
   })
   email: string;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'deadline',
+    unique: false,
+  })
+  deadline: Date;
+
   @Column('date', { name: 'closedate', nullable: true })
   closeDate: Date;
 
