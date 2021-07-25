@@ -20,7 +20,7 @@ import { JobCategory } from './job-category.entity';
 @Entity('job', { schema: 'public' })
 export class Job extends NamedEntity {
   static plural = 'jobs';
-  @Column('varchar', { name: 'description', nullable: false })
+  @Column('varchar', { name: 'description', nullable: true })
   description: string;
 
   @Column('varchar', { name: 'location', nullable: true })
