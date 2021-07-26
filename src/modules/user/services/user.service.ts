@@ -36,7 +36,7 @@ export class UserService extends BaseService<User> {
   }
 
   async findSavedJobs({ user, page, size }): Promise<any> {
-    let query = `SELECT JOBID FROM SAVEDJOBS WHERE USERID=${user.id}`;
+    let query = `SELECT JOBID FROM SAVEDJOB WHERE USERID=${user.id}`;
     let appliedJobs = (await this.repository.manager.query(query)).map(
       (job: { jobId: any }) => job.jobId,
     );
