@@ -47,7 +47,8 @@ export const resolveResponse: any = (responseObject: any) => {
         if (
           attributeKey === 'dp' ||
           attributeKey === 'logo' ||
-          attributeKey === 'cv'
+          attributeKey === 'cv' ||
+          attributeKey === 'attachment'
         ) {
           newResponseObject[attributeKey] =
             getConfiguration().serverurl + attributeValue;

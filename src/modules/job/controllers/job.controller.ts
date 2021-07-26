@@ -67,7 +67,7 @@ export class JobController extends BaseController<Job> {
         destination: getConfiguration().job,
         filename: editFileName,
       }),
-      fileFilter: imageFileFilter,
+      fileFilter: filesFilter,
     }),
   )
   async createJobs(
@@ -120,7 +120,7 @@ export class JobController extends BaseController<Job> {
         destination: getConfiguration().job,
         filename: editFileName,
       }),
-      fileFilter: imageFileFilter,
+      fileFilter: filesFilter,
     }),
   )
   async uploadedFile(@UploadedFile() file: any, @Body() body: any) {
