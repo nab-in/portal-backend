@@ -403,6 +403,6 @@ export class UserController extends BaseController<User> {
 
   @Get(':imgpath/cv')
   seecv(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: getConfiguration().dp });
+    return res.sendFile(image, { root: getConfiguration().cv });
   }
 }
