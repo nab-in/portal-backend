@@ -22,6 +22,7 @@ import { diskStorage } from 'multer';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
+  filesFilter,
   imageFileFilter,
 } from '../../../core/helpers/sanitize-image';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
@@ -105,7 +106,7 @@ export class UserController extends BaseController<User> {
         destination: getConfiguration().cv,
         filename: editFileName,
       }),
-      fileFilter: imageFileFilter,
+      fileFilter: filesFilter,
     }),
   )
   async uploadedCv(
