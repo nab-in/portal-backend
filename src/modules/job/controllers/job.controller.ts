@@ -17,13 +17,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
-import { getConfiguration } from '../../../core/utilities/systemConfigs';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
   filesFilter,
-  imageFileFilter,
 } from '../../../core/helpers/sanitize-image';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
@@ -31,6 +30,7 @@ import {
   genericFailureResponse,
   postSuccessResponse,
 } from '../../../core/utilities/response.helper';
+import { getConfiguration } from '../../../core/utilities/systemConfigs';
 import { User } from '../../user/entities/user.entity';
 import { Job } from '../entities/job.entity';
 import { JobService } from '../services/job.service';
@@ -112,7 +112,7 @@ export class JobController extends BaseController<Job> {
     }
   }
 
-  @Post('profile')
+  @Post(':id/profile')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileInterceptor('', {
@@ -123,8 +123,8 @@ export class JobController extends BaseController<Job> {
       fileFilter: filesFilter,
     }),
   )
-  async uploadedFile(@UploadedFile() file: any, @Body() body: any) {
-    const job = await this.service.findOneByUid(body.job);
+  async uploadedFile(@UploadedFile() file: any, @Param() params: any) {
+    const job = await this.service.findOneByUid(params.id);
     const response = {
       originalname: file.originalname,
       filename: file.filename,
@@ -134,8 +134,9 @@ export class JobController extends BaseController<Job> {
       await this.service.update(job);
       return response;
     } else {
+      fs.unlinkSync(getConfiguration().job + '/' + file.filename);
       throw new NotFoundException(
-        `Job with ID ${body.company} could not be found`,
+        `Job with ID ${params.id} could not be found`,
       );
     }
   }
