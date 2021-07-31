@@ -179,10 +179,6 @@ export class User extends NamedEntity {
   @BeforeUpdate()
   async beforeUpdating() {
     this.lastupdated = new Date();
-    if (this.password) {
-      this.salt = await bcrypt.genSalt();
-      this.password = await this.hashPassword(this.password, this.salt);
-    }
   }
   public static async verifyUser(username: any, password: any): Promise<any> {
     let user: any;

@@ -62,7 +62,7 @@ export class JobController extends BaseController<Job> {
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   @UseInterceptors(
-    FileInterceptor('attachment', {
+    FileInterceptor('', {
       storage: diskStorage({
         destination: getConfiguration().job,
         filename: editFileName,
@@ -82,9 +82,9 @@ export class JobController extends BaseController<Job> {
       user,
       'POST',
     );
-    if (file && file.name) {
+    if (file && file.filename) {
       resolvedEntity['attachment'] =
-        getConfiguration().serverurl + '/api/' + file.filename + '/attachment';
+        '/api/jobs/' + file.filename + '/attachment';
     }
 
     const createdEntity = await this.service.create(resolvedEntity);
