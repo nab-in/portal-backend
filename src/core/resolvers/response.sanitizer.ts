@@ -50,6 +50,25 @@ export const resolveResponse: any = (responseObject: any) => {
           attributeKey === 'cv' ||
           attributeKey === 'attachment'
         ) {
+          /*if (attributeKey === 'attachment') {
+            newResponseObject[attributeKey] =
+              getConfiguration().serverurl +
+              '/api/jobs/' +
+              attributeValue +
+              '/attachment';
+          }
+          if (attributeKey === 'dp') {
+            newResponseObject[attributeKey] =
+              getConfiguration().serverurl + attributeValue;
+          }
+          if (attributeKey === 'cv') {
+            newResponseObject[attributeKey] =
+              getConfiguration().serverurl + attributeValue;
+          }
+          if (attributeKey === 'dp') {
+            newResponseObject[attributeKey] =
+              getConfiguration().serverurl + attributeValue;
+          }*/
           newResponseObject[attributeKey] =
             getConfiguration().serverurl + attributeValue;
         } else {
