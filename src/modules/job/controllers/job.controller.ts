@@ -130,7 +130,7 @@ export class JobController extends BaseController<Job> {
       filename: file.filename,
     };
     if (job) {
-      job['attachment'] = '/api/' + file.filename + '/attachment';
+      job['attachment'] = '/api/jobs/' + file.filename + '/attachment';
       await this.service.update(job);
       return response;
     } else {
