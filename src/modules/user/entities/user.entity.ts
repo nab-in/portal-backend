@@ -160,10 +160,19 @@ export class User extends NamedEntity {
     eager: false,
   })
   updatedCompanies: Job[];
-
-  @OneToMany(() => UserRole, (userrole) => userrole.user)
+  @ManyToMany(() => UserRole, (userrole) => userrole.users, { nullable: true })
+  @JoinTable({
+    name: 'userrolesmember',
+    joinColumn: {
+      name: 'userid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userroleid',
+      referencedColumnName: 'id',
+    },
+  })
   userroles: UserRole[];
-
   @BeforeInsert()
   async beforeUpdateTransaction() {
     this.dp = this.dp || '/api/users/dp.png/dp';

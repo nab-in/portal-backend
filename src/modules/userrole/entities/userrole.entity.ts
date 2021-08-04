@@ -1,16 +1,23 @@
-import { User } from '../../user/entities/user.entity';
-import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+} from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { User } from '../../user/entities/user.entity';
 @Entity('userrole', { schema: 'public' })
 export class UserRole extends NamedEntity {
   static plural = 'userRoles';
 
-  @ManyToOne(() => User, (user) => user.userroles, {
+  @ManyToMany(() => User, (user) => user.userroles, {
     cascade: false,
+    nullable: true,
   })
-  @JoinColumn({ name: 'userid', referencedColumnName: 'id' })
-  user: User;
+  @JoinColumn({ name: 'userroleid', referencedColumnName: 'id' })
+  users: User[];
 
   @BeforeInsert()
   beforeUpdateTransaction() {
