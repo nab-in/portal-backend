@@ -40,6 +40,20 @@ export class Job extends NamedEntity {
   })
   deadline: Date;
 
+  @Column('varchar', {
+    nullable: true,
+    name: 'opento',
+    unique: false,
+  })
+  openTo: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'jobtype',
+    unique: false,
+  })
+  jobType: string;
+
   @Column('date', { name: 'closedate', nullable: true })
   closeDate: Date;
 
