@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { query } from 'express';
 import { diskStorage } from 'multer';
-import { BaseController } from '../../../core/controllers/base.controller';
+import { Job } from '../../job/entities/job.entity';
 import {
   editFileName,
   filesFilter,
@@ -39,10 +39,8 @@ import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 
 @Controller('api/' + User.plural)
-export class UserController extends BaseController<User> {
-  constructor(private service: UserService) {
-    super(service, User);
-  }
+export class UserController {
+  constructor(private service: UserService) {}
   @Post('register')
   @UseFilters(new HttpErrorFilter())
   async register(
@@ -212,7 +210,7 @@ export class UserController extends BaseController<User> {
     }
     const response = {
       pager,
-      jobs: jobs.map((job) => resolveResponse(job)),
+      jobs: jobs.map((job: Job) => resolveResponse(job)),
     };
     return res.status(HttpStatus.OK).send(response);
   }
@@ -253,7 +251,7 @@ export class UserController extends BaseController<User> {
     };
     return res.status(HttpStatus.OK).send(response);
   }
-  @Get()
+  /*@Get()
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
   async findAll(@Query() query): Promise<any> {
@@ -287,7 +285,7 @@ export class UserController extends BaseController<User> {
         resolveResponse(contents),
       ),
     };
-  }
+  }*/
   @Get('belongstocompany')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
@@ -320,7 +318,7 @@ export class UserController extends BaseController<User> {
     }
   }
 
-  @Get(':id')
+  /* @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   async findOneUser(
@@ -336,7 +334,7 @@ export class UserController extends BaseController<User> {
         message: `Item with identifier ${params.id} could not be found`,
       });
     }
-  }
+  }*/
   @Put('passwordupdate')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
@@ -349,7 +347,7 @@ export class UserController extends BaseController<User> {
     const changedPassword = await this.service.changePassword(user, body);
     return res.status(HttpStatus.OK).send(resolveResponse(changedPassword));
   }
-  @Put(':id')
+  @Put()
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   async updateUser(
@@ -358,30 +356,14 @@ export class UserController extends BaseController<User> {
     @Param() params,
     @Body() updateEntityDto,
   ): Promise<User> {
-    const updateEntity = await this.service.findOneByUid(params.id);
+    const updateEntity = await this.service.findOneByUid(updateEntityDto.token);
     if (updateEntity !== undefined) {
-      if (updateEntityDto.email || updateEntityDto.username) {
-        const verifyOldPassword = await User.validatePassword(
-          updateEntityDto.userpassword,
-          updateEntity.salt,
-          updateEntity.password,
-        );
-        if (verifyOldPassword) {
-          updateEntityDto['id'] = updateEntity['id'];
-          const resolvedEntityDTO: any = await this.service.EntityUidResolver(
-            updateEntityDto,
-            'PUT',
-          );
-          await this.service.update(resolvedEntityDTO);
-          const data = await this.service.findOneByUid(params.id);
-          return res.status(HttpStatus.OK).send({
-            message: `Item with id ${params.id} updated successfully.`,
-            payload: resolveResponse(data),
-          });
-        }
-      }
-
-      if (!updateEntityDto.email && !updateEntityDto.username) {
+      const verifyOldPassword = await User.validatePassword(
+        updateEntityDto.userpassword,
+        updateEntity.salt,
+        updateEntity.password,
+      );
+      if (verifyOldPassword) {
         updateEntityDto['id'] = updateEntity['id'];
         const resolvedEntityDTO: any = await this.service.EntityUidResolver(
           updateEntityDto,

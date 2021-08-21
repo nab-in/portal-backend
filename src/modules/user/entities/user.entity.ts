@@ -159,7 +159,7 @@ export class User extends NamedEntity {
   @OneToMany(() => Company, (company) => company.lastUpdatedBy, {
     eager: false,
   })
-  updatedCompanies: Job[];
+  updatedCompanies: Company[];
   @ManyToMany(() => UserRole, (userrole) => userrole.users, { nullable: true })
   @JoinTable({
     name: 'userrolesmember',
