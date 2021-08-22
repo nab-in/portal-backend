@@ -18,8 +18,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { query } from 'express';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
-import { Job } from '../../job/entities/job.entity';
 import {
   editFileName,
   filesFilter,
@@ -35,9 +35,9 @@ import {
 } from '../../../core/utilities/response.helper';
 import { getConfiguration } from '../../../core/utilities/systemConfigs';
 import { Company } from '../../company/entities/company.entity';
+import { Job } from '../../job/entities/job.entity';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
-
 @Controller('api/' + User.plural)
 export class UserController {
   constructor(private service: UserService) {}
@@ -82,9 +82,13 @@ export class UserController {
         message: 'Profile picture saved successfully',
       };
       const user: User = await this.service.findOneByUid(req.user.id);
+      const oldDp = user?.dp;
       if (user.id) {
         user.dp = file.filename;
         await this.service.update(user);
+        if (oldDp && oldDp !== 'dp.png') {
+          fs.unlinkSync(getConfiguration().dp + '/' + oldDp);
+        }
         return response;
       } else {
         throw new NotFoundException(
@@ -107,11 +111,7 @@ export class UserController {
       fileFilter: filesFilter,
     }),
   )
-  async uploadedCv(
-    @UploadedFile() file: any,
-    @Body() body: any,
-    @Req() req: any,
-  ) {
+  async uploadedCv(@UploadedFile() file: any, @Req() req: any) {
     try {
       const path: string = '/api/users/' + file.filename + '/cv';
       const response = {
@@ -119,9 +119,13 @@ export class UserController {
         message: 'CV saved successfully',
       };
       const user: User = await this.service.findOneByUid(req.user.id);
+      const oldCv = user?.cv;
       if (user.id) {
         user.cv = file.filename;
         await this.service.update(user);
+        if (oldCv && oldCv !== 'dp.png') {
+          fs.unlinkSync(getConfiguration().cv + '/' + oldCv);
+        }
         return response;
       } else {
         throw new NotFoundException(
