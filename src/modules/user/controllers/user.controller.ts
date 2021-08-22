@@ -136,6 +136,32 @@ export class UserController {
       throw new Error(e.message);
     }
   }
+
+  @Post(':id/interview/')
+  @UseGuards(AuthGuard('jwt'))
+  async interview(
+    @Body() body: { job: string },
+    @Param() param: { id: string },
+    @Res() res: any,
+  ): Promise<any> {
+    const job = await this.service.findJob(body.job);
+    const user = await this.service.findOneByUid(param.id);
+    if (job) {
+      if (user) {
+        const callForInterview = await this.service.interview({ job, user });
+        return res.status(HttpStatus.OK).send(callForInterview.message);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send(`User with ID ${param.id} could not be found`);
+      }
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send(`Job with ID ${body.job} could not be found`);
+    }
+  }
+
   @Get('appliedJobs')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))

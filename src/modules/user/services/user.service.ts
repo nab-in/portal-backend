@@ -106,4 +106,11 @@ export class UserService extends BaseService<User> {
       throw new Error(e.message);
     }
   }
+  async interview({ job, user }): Promise<any> {
+    const query = `UPDATE APPLIEDJOB SET INTERVIEW=TRUE WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    await this.repository.manager.query(query);
+    return {
+      message: `<${user.firstname} ${user.lastname}> has been invited for the interview`,
+    };
+  }
 }
