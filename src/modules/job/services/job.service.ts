@@ -26,7 +26,7 @@ export class JobService extends BaseService<Job> {
     const query = `INSERT INTO APPLIEDJOB(USERId, JOBID) VALUES(${user.id}, ${job.id})`;
     await this.userrepository.manager.query(query);
     return {
-      message: `You have successfully applied to with name ${job.name}`,
+      message: `You have successfully applied to with name <${job.name}>`,
     };
   }
   async revoke({ job, user }): Promise<{ message: string }> {

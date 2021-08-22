@@ -14,7 +14,15 @@ export const resolveResponse: any = (responseObject: any) => {
     id: responseObject.uid,
   };
   const attributeKeys = Object.keys(
-    omit(responseObject, ['id', 'uid', 'password', 'salt', 'userid', 'jobid']),
+    omit(responseObject, [
+      'id',
+      'uid',
+      'password',
+      'salt',
+      'userid',
+      'jobid',
+      'count',
+    ]),
   );
   attributeKeys.forEach((attributeKey) => {
     let attributeValue: string | boolean | number | any;
