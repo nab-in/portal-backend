@@ -124,6 +124,7 @@ export class JobController extends BaseController<Job> {
   )
   async uploadedFile(@UploadedFile() file: any, @Param() params: any) {
     const job = await this.service.findOneByUid(params.id);
+    const oldAttachment = job?.attachment;
     const response = {
       originalname: file.originalname,
       filename: file.filename,
@@ -131,6 +132,13 @@ export class JobController extends BaseController<Job> {
     if (job) {
       job['attachment'] = file.filename;
       await this.service.update(job);
+
+      /*
+       * Delete Old Attachment file
+       */
+      if (oldAttachment) {
+        fs.unlinkSync(getConfiguration().job + '/' + oldAttachment);
+      }
       return response;
     } else {
       fs.unlinkSync(getConfiguration().job + '/' + file.filename);
