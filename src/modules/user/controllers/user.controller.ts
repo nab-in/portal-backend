@@ -251,41 +251,58 @@ export class UserController {
     };
     return res.status(HttpStatus.OK).send(response);
   }
-  /*@Get()
+  @Get()
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
-  async findAll(@Query() query): Promise<any> {
-    if (query.paging === 'false') {
-      const allContents: User[] = await this.service.findAll();
-      return {
-        [User.plural]: (allContents || []).map((contents) =>
+  async findAll(
+    @Query() query,
+    @Req() req: any,
+    @Res() res: any,
+  ): Promise<any> {
+    const user: User = req.user;
+    if (
+      user.userRoles &&
+      user.userRoles.map(
+        (user) =>
+          user.name.toLowerCase().includes('super') ||
+          user.name.toLowerCase().includes('admin'),
+      ).length > 0
+    ) {
+      if (query.paging === 'false') {
+        const allContents: User[] = await this.service.findAll();
+        return {
+          [User.plural]: (allContents || []).map((contents) =>
+            resolveResponse(contents),
+          ),
+        };
+      }
+      const pagerDetails: any = getPagerDetails(query);
+
+      const [entityRes, totalCount]: [User[], number] =
+        await this.service.findAndCount(
+          query?.fields,
+          query?.filter,
+          pagerDetails.pageSize,
+          pagerDetails.page - 1,
+        );
+      const userData = {
+        pager: {
+          ...pagerDetails,
+          pageCount: entityRes.length,
+          total: totalCount,
+          nextPage: `/api/${User.plural}?page=${+pagerDetails.page + +'1'}`,
+        },
+        [User.plural]: (entityRes || []).map((contents) =>
           resolveResponse(contents),
         ),
       };
+      return res.status(HttpStatus.OK).send(userData);
+    } else {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send('You have limited access to this resource');
     }
-
-    const pagerDetails: any = getPagerDetails(query);
-
-    const [entityRes, totalCount]: [User[], number] =
-      await this.service.findAndCount(
-        query.fields,
-        query.filter,
-        pagerDetails.pageSize,
-        pagerDetails.page - 1,
-      );
-
-    return {
-      pager: {
-        ...pagerDetails,
-        pageCount: entityRes.length,
-        total: totalCount,
-        nextPage: `/api/${User.plural}?page=${+pagerDetails.page + +'1'}`,
-      },
-      [User.plural]: (entityRes || []).map((contents) =>
-        resolveResponse(contents),
-      ),
-    };
-  }*/
+  }
   @Get('belongstocompany')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
@@ -356,7 +373,7 @@ export class UserController {
     @Param() params,
     @Body() updateEntityDto,
   ): Promise<User> {
-    const updateEntity = await this.service.findOneByUid(updateEntityDto.token);
+    const updateEntity = await this.service.findOneByUid(req.user.id);
     if (updateEntity !== undefined) {
       const verifyOldPassword = await User.validatePassword(
         updateEntityDto.userpassword,
@@ -370,12 +387,65 @@ export class UserController {
           'PUT',
         );
         await this.service.update(resolvedEntityDTO);
-        const data = await this.service.findOneByUid(params.id);
+        const data = await this.service.findOneByUid(req.user.id);
         return res.status(HttpStatus.OK).send({
-          message: `Item with id ${params.id} updated successfully.`,
+          message: `Item with id ${req.user.id} updated successfully.`,
           payload: resolveResponse(data),
         });
       }
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send('User with such token is unavailable');
+    }
+  }
+  @Put('id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseFilters(new HttpErrorFilter())
+  async update(
+    @Req() req: any,
+    @Res() res: any,
+    @Param() params,
+    @Body() updateEntityDto,
+  ): Promise<User> {
+    const user: User = req.user;
+    if (
+      user.userRoles &&
+      user.userRoles.map(
+        (user) =>
+          user.name.toLowerCase().includes('super') ||
+          user.name.toLowerCase().includes('admin'),
+      ).length > 0
+    ) {
+      const updateEntity = await this.service.findOneByUid(params.id);
+      if (updateEntity !== undefined) {
+        const verifyOldPassword = await User.validatePassword(
+          updateEntityDto.userpassword,
+          updateEntity.salt,
+          updateEntity.password,
+        );
+        if (verifyOldPassword) {
+          updateEntityDto['id'] = updateEntity['id'];
+          const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+            updateEntityDto,
+            'PUT',
+          );
+          await this.service.update(resolvedEntityDTO);
+          const data = await this.service.findOneByUid(req.user.id);
+          return res.status(HttpStatus.OK).send({
+            message: `Item with id ${req.user.id} updated successfully.`,
+            payload: resolveResponse(data),
+          });
+        }
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('User with such token is unavailable');
+      }
+    } else {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send('You have no enough permissions to perform this action');
     }
   }
   @Get(':imgpath/dp')
