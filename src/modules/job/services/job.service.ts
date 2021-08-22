@@ -29,6 +29,24 @@ export class JobService extends BaseService<Job> {
       message: `You have successfully applied to with name <${job.name}>`,
     };
   }
+  async applicants({ job, size, page }): Promise<any> {
+    const query = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB WHERE JOBID=${job.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
+    const jobApplicants = await this.repository.manager.query(query);
+    if (jobApplicants.length > 0) {
+      let applicants = jobApplicants.map(async (data: { userid: any }) => {
+        const user = await this.userrepository.findOne({
+          where: { id: data.userid },
+        });
+        return { ...data, ...user };
+      });
+      applicants = [].concat.apply([], await Promise.all(applicants));
+      const total =
+        jobApplicants && jobApplicants[0].count ? jobApplicants[0].count : 0;
+      return [applicants, total];
+    } else {
+      return [[], 0];
+    }
+  }
   async revoke({ job, user }): Promise<{ message: string }> {
     const query = `DELETE FROM APPLIEDJOB WHERE USERID = ${user.id} AND JOBID=${job.id}`;
     await this.userrepository.manager.query(query);
