@@ -81,7 +81,7 @@ export class Company extends NamedEntity {
 
   @BeforeInsert()
   beforeUpdateTransaction() {
-    this.logo = this.logo || `/api/companies/logo.png/logo`;
+    this.logo = this.logo || `logo.png`;
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();

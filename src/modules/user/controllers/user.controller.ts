@@ -83,7 +83,7 @@ export class UserController {
       };
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
-        user.dp = path;
+        user.dp = file.filename;
         await this.service.update(user);
         return response;
       } else {
@@ -120,7 +120,7 @@ export class UserController {
       };
       const user: User = await this.service.findOneByUid(req.user.id);
       if (user.id) {
-        user.cv = path;
+        user.cv = file.filename;
         await this.service.update(user);
         return response;
       } else {

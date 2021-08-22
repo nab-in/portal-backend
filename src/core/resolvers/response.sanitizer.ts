@@ -50,7 +50,7 @@ export const resolveResponse: any = (responseObject: any) => {
           attributeKey === 'cv' ||
           attributeKey === 'attachment'
         ) {
-          /*if (attributeKey === 'attachment') {
+          if (attributeKey === 'attachment') {
             newResponseObject[attributeKey] =
               getConfiguration().serverurl +
               '/api/jobs/' +
@@ -59,18 +59,25 @@ export const resolveResponse: any = (responseObject: any) => {
           }
           if (attributeKey === 'dp') {
             newResponseObject[attributeKey] =
-              getConfiguration().serverurl + attributeValue;
+              getConfiguration().serverurl +
+              '/api/users/' +
+              attributeValue +
+              '/dp';
           }
           if (attributeKey === 'cv') {
             newResponseObject[attributeKey] =
-              getConfiguration().serverurl + attributeValue;
+              getConfiguration().serverurl +
+              '/api/users/' +
+              attributeValue +
+              '/cv';
           }
-          if (attributeKey === 'dp') {
+          if (attributeKey === 'logo') {
             newResponseObject[attributeKey] =
-              getConfiguration().serverurl + attributeValue;
-          }*/
-          newResponseObject[attributeKey] =
-            getConfiguration().serverurl + attributeValue;
+              getConfiguration().serverurl +
+              '/api/companies/' +
+              attributeValue +
+              '/logo';
+          }
         } else {
           newResponseObject[attributeKey] = attributeValue;
         }

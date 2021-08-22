@@ -175,7 +175,7 @@ export class User extends NamedEntity {
   userRoles: UserRole[];
   @BeforeInsert()
   async beforeUpdateTransaction() {
-    this.dp = this.dp || '/api/users/dp.png/dp';
+    this.dp = this.dp || 'dp.png';
     this.verified = false;
     this.enabled = true;
     this.created = new Date();

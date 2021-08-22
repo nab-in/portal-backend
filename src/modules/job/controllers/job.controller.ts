@@ -83,8 +83,7 @@ export class JobController extends BaseController<Job> {
       'POST',
     );
     if (file && file.filename) {
-      resolvedEntity['attachment'] =
-        '/api/jobs/' + file.filename + '/attachment';
+      resolvedEntity['attachment'] = file.filename;
     }
 
     const createdEntity = await this.service.create(resolvedEntity);
@@ -130,7 +129,7 @@ export class JobController extends BaseController<Job> {
       filename: file.filename,
     };
     if (job) {
-      job['attachment'] = file.filename + '/attachment';
+      job['attachment'] = file.filename;
       await this.service.update(job);
       return response;
     } else {
@@ -141,27 +140,6 @@ export class JobController extends BaseController<Job> {
     }
   }
 
-  @Post('profiles')
-  @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FilesInterceptor('', 20, {
-      storage: diskStorage({
-        destination: getConfiguration().job,
-        filename: editFileName,
-      }),
-      fileFilter: filesFilter,
-    }),
-  )
-  async uploadMultipleFiles(@UploadedFiles() files) {
-    const fileData = files.map((file: { originalname: any; filename: any }) => {
-      const fileReponse = {
-        originalname: file.originalname,
-        filename: file.filename,
-      };
-      return fileReponse;
-    });
-    return fileData;
-  }
   @Get(':imgpath/attachment')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: getConfiguration().job });
