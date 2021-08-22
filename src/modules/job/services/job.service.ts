@@ -23,26 +23,28 @@ export class JobService extends BaseService<Job> {
     return sessionUser;
   }
   async apply({ job, user }): Promise<{ message: string }> {
-    const query = `INSERT INTO USERJOBS("userId", "jobId") VALUES(${user.id}, ${job.id})`;
-    await this.userrepository.manager.query(query);
-    return { message: 'You have successfully applied to this job' };
-  }
-  async revoke({ job, user }): Promise<{ message: string }> {
-    const query = `DELETE FROM USERJOBS WHERE "userId" = ${user.id} AND "jobId"=${job.id}`;
+    const query = `INSERT INTO APPLIEDJOB(USERId, JOBID) VALUES(${user.id}, ${job.id})`;
     await this.userrepository.manager.query(query);
     return {
-      message: 'You have revoked successfully your application from this job',
+      message: `You have successfully applied to with name ${job.name}`,
+    };
+  }
+  async revoke({ job, user }): Promise<{ message: string }> {
+    const query = `DELETE FROM APPLIEDJOB WHERE USERID = ${user.id} AND JOBID=${job.id}`;
+    await this.userrepository.manager.query(query);
+    return {
+      message: `You have revoked successfully your application from job with name <${job.name}>`,
     };
   }
   async saveJob({ user, job }): Promise<{ message: string }> {
-    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${user}, ${job})`;
+    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${user.id}, ${job.id})`;
     try {
       await this.repository.manager.query(sql);
-      return { message: `Job saved successfully` };
+      return { message: `Job with name <${job.name}> saved successfully` };
     } catch (e) {
-      if (e.detail.includes('already exists')) {
+      if (e && e.detail && e.detail.includes('already exists')) {
         throw new HttpException(
-          'You have already saved this job',
+          `You have already saved job with name <${job.name}>`,
           HttpStatus.CONFLICT,
         );
       } else {
