@@ -107,7 +107,7 @@ export class UserService extends BaseService<User> {
     }
   }
   async interview({ job, user }): Promise<any> {
-    const query = `UPDATE APPLIEDJOB SET INTERVIEW=TRUE WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    const query = `UPDATE APPLIEDJOB SET INTERVIEW=TRUE, DATE='${job.date}', LOCATION='${job.location}' WHERE USERID=${user.id} AND JOBID=${job.id}`;
     await this.repository.manager.query(query);
     return {
       message: `<${user.firstname} ${user.lastname}> has been invited for the interview`,
@@ -119,6 +119,14 @@ export class UserService extends BaseService<User> {
     await this.repository.manager.query(query);
     return {
       message: `<${user.firstname} ${user.lastname}'s> application has been rejected`,
+    };
+  }
+
+  async accept({ job, user }): Promise<any> {
+    const query = `UPDATE APPLIEDJOB SET ACCEPTED=TRUE WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    await this.repository.manager.query(query);
+    return {
+      message: `You have accepted the call for interview for job <${job.name}>`,
     };
   }
 }
