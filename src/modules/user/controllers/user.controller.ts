@@ -445,7 +445,7 @@ export class UserController {
     } else {
       return res
         .status(HttpStatus.FORBIDDEN)
-        .send('You have no enough permissions to perform this action');
+        .send('You have no permission to perform this action');
     }
   }
   @Get(':imgpath/dp')
