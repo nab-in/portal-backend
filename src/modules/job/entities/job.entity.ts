@@ -76,8 +76,17 @@ export class Job extends NamedEntity {
   lastUpdatedBy: User;
 
   @ManyToMany(() => User, (user) => user.jobs, { nullable: true })
-  @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
-  @JoinTable({ name: 'userjobs' })
+  @JoinTable({
+    name: 'appliedjob',
+    joinColumn: {
+      name: 'jobid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userid',
+      referencedColumnName: 'id',
+    },
+  })
   users: User[];
 
   @ManyToMany(() => User, (user) => user.savedJobs, { nullable: true })

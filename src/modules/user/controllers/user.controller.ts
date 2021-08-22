@@ -145,7 +145,6 @@ export class UserController {
     @Query() query: any,
   ): Promise<any> {
     const pagerDetails: any = getPagerDetails(query);
-
     const user = await this.service.findOneByUid(req.user.id);
     const [jobs, total] = await this.service.findUserJobs({
       user,

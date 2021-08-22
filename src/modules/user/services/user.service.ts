@@ -21,33 +21,35 @@ export class UserService extends BaseService<User> {
     super(repository, User);
   }
   async findUserJobs({ user, page, size }): Promise<any> {
-    let query = `SELECT "jobId" FROM USERJOBS WHERE "userId"=${user.id}`;
-    let appliedJobs = (await this.repository.manager.query(query)).map(
-      (job: { jobId: any }) => job.jobId,
-    );
-    const [jobs, total] = await this.jobrepository.findAndCount({
-      where: {
-        id: In(appliedJobs),
-      },
-      skip: page * size,
-      take: size,
-    });
-    return [jobs, total];
+    const query = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB WHERE USERID=${user.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
+    const appliedJobs = await this.repository.manager.query(query);
+    if (appliedJobs.length > 0) {
+      let jobs = appliedJobs.map(async (data: { jobid: any }) => {
+        const jobData = await this.jobrepository.findOne({
+          where: { id: data.jobid },
+        });
+        return { ...data, ...jobData };
+      });
+      jobs = await Promise.all(jobs);
+      const total =
+        appliedJobs && appliedJobs[0].count ? appliedJobs[0].count : 0;
+      return [jobs, total];
+    } else {
+      return [[], 0];
+    }
   }
 
   async findSavedJobs({ user, page, size }): Promise<any> {
-    let query = `SELECT JOBID FROM SAVEDJOB WHERE USERID=${user.id}`;
-    let appliedJobs = (await this.repository.manager.query(query)).map(
-      (job: { jobId: any }) => job.jobId,
-    );
-    const [jobs, total] = await this.jobrepository.findAndCount({
-      where: {
-        id: In(appliedJobs),
-      },
-      skip: page * size,
-      take: size,
-    });
-    return [jobs, total];
+    const query = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT JOBID FROM SAVEDJOB WHERE USERID=${user.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
+    const job = await this.repository.manager.query(query);
+    if (job.lenght > 0) {
+      const appliedJobs = job.map((job: { jobid: any }) => job.jobid);
+      const total = job && job[0].count ? job[0].count : 0;
+      const jobs = this.jobrepository.find({ where: { id: In(appliedJobs) } });
+      return [jobs, total];
+    } else {
+      return [[], 0];
+    }
   }
 
   async createdJobs({ user, page, size }): Promise<any> {
