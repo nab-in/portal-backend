@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from '../../../core/services/base.service';
 import { User } from '../../user/entities/user.entity';
@@ -34,13 +34,24 @@ export class JobService extends BaseService<Job> {
       message: 'You have revoked successfully your application from this job',
     };
   }
-  async saveJob(userid: number, jobid: number): Promise<{ message: string }> {
-    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${userid}, ${jobid})`;
-    await this.repository.manager.query(sql);
-    return { message: `Job saved successfully` };
+  async saveJob({ user, job }): Promise<{ message: string }> {
+    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${user}, ${job})`;
+    try {
+      await this.repository.manager.query(sql);
+      return { message: `Job saved successfully` };
+    } catch (e) {
+      if (e.detail.includes('already exists')) {
+        throw new HttpException(
+          'You have already saved this job',
+          HttpStatus.CONFLICT,
+        );
+      } else {
+        throw new Error(e.message);
+      }
+    }
   }
-  async removeJob(userid: number, jobid: number): Promise<{ message: string }> {
-    const sql = `DELETE FROM SAVEDJOB  WHERE USERID=${userid} AND JOBID=${jobid}`;
+  async removeJob({ user, job }): Promise<{ message: string }> {
+    const sql = `DELETE FROM SAVEDJOB  WHERE USERID=${user} AND JOBID=${job}`;
     await this.repository.manager.query(sql);
     return { message: `Job removed successfully` };
   }

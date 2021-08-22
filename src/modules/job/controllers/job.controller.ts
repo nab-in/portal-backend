@@ -162,7 +162,7 @@ export class JobController extends BaseController<Job> {
   ): Promise<any> {
     const job = await this.service.findOneByUid(param.job);
     const user = await this.service.findUser(req.user.id);
-    const saved = await this.service.saveJob(job.id, user.id);
+    const saved = await this.service.saveJob({ job: job.id, user: user.id });
     return res.status(HttpStatus.CREATED).send(saved);
   }
 
@@ -176,7 +176,7 @@ export class JobController extends BaseController<Job> {
   ): Promise<any> {
     const job = await this.service.findOneByUid(param.job);
     const user = await this.service.findUser(req.user.id);
-    const saved = await this.service.removeJob(job.id, user.id);
+    const saved = await this.service.removeJob({ job: job.id, user: user.id });
     return res.status(HttpStatus.OK).send(saved);
   }
 }
