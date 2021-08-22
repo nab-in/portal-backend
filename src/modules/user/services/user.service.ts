@@ -113,4 +113,12 @@ export class UserService extends BaseService<User> {
       message: `<${user.firstname} ${user.lastname}> has been invited for the interview`,
     };
   }
+
+  async rejectinterview({ job, user }): Promise<any> {
+    const query = `UPDATE APPLIEDJOB SET INTERVIEW=FALSE WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    await this.repository.manager.query(query);
+    return {
+      message: `<${user.firstname} ${user.lastname}'s> application has been rejected`,
+    };
+  }
 }
