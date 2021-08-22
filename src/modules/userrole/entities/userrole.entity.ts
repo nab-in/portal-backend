@@ -1,6 +1,7 @@
 import {
   BeforeInsert,
   BeforeUpdate,
+  Column,
   Entity,
   JoinColumn,
   ManyToMany,
@@ -12,7 +13,14 @@ import { User } from '../../user/entities/user.entity';
 export class UserRole extends NamedEntity {
   static plural = 'userRoles';
 
-  @ManyToMany(() => User, (user) => user.userroles, {
+  @Column('varchar', {
+    nullable: false,
+    name: 'name',
+    unique: true,
+  })
+  name: string;
+
+  @ManyToMany(() => User, (user) => user.userRoles, {
     cascade: false,
     nullable: true,
   })

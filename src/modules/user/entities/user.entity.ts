@@ -172,7 +172,7 @@ export class User extends NamedEntity {
       referencedColumnName: 'id',
     },
   })
-  userroles: UserRole[];
+  userRoles: UserRole[];
   @BeforeInsert()
   async beforeUpdateTransaction() {
     this.dp = this.dp || '/api/users/dp.png/dp';
@@ -196,10 +196,12 @@ export class User extends NamedEntity {
     if (isEmail) {
       user = await User.findOne({
         where: { email: username },
+        relations: ['userRoles'],
       });
     } else {
       user = await User.findOne({
         where: { username },
+        relations: ['userRoles'],
       });
     }
     if (
