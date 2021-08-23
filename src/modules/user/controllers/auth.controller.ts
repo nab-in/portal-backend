@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpStatus,
-  Param,
   Post,
   Query,
   Req,
@@ -11,12 +10,13 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
-import { getSuccessResponse } from 'src/core/utilities/response.helper';
-import { AuthService } from '../services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ExtractJwt } from 'passport-jwt';
+import e from 'express';
+import { getSuccessResponse } from 'src/core/utilities/response.helper';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
+import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
+import { User } from '../entities/user.entity';
+import { AuthService } from '../services/auth.service';
 
 @Controller('api')
 export class AuthController {
@@ -65,7 +65,17 @@ export class AuthController {
     @Res() res: any,
     @Query() query: any,
   ): Promise<any> {
-    const metrics = await this.authService.getMertics();
-    return res.status(HttpStatus.OK).send(metrics);
+    const user: User = req.user;
+    const admin = user.userRoles.map(
+      (role) => role.name === 'SUPER USER' || role.name === 'ADMIN',
+    );
+    if (admin.length > 0) {
+      const metrics = await this.authService.getMertics();
+      return res.status(HttpStatus.OK).send(metrics);
+    } else {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send('You do not have access to this resource');
+    }
   }
 }
