@@ -34,6 +34,12 @@ VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','${hash}
     await queryRunner.query(
       'ALTER TABLE APPLIEDJOB ADD COLUMN INTERVIEW BOOLEAN',
     );
+    await queryRunner.query(
+      'ALTER TABLE JOBCATEGORY ALTER COLUMN NAME SET NOT NULL',
+    );
+    await queryRunner.query(
+      'ALTER TABLE JOBCATEGORY ADD CONSTRAINT UQ_JOBCATEGORY_NAME UNIQUE(name)',
+    );
     await queryRunner.query('ALTER TABLE APPLIEDJOB ADD COLUMN DATE DATE');
     await queryRunner.query(
       'ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  CHARACTER VARYING(255)',
