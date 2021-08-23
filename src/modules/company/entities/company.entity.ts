@@ -52,6 +52,12 @@ export class Company extends NamedEntity {
 
   @Column('varchar', {
     nullable: true,
+    name: 'verified',
+  })
+  verified: string;
+
+  @Column('varchar', {
+    nullable: true,
     name: 'bio',
   })
   bio: string;
