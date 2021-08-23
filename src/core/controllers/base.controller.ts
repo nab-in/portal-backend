@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { User } from '../../modules/user/entities/user.entity';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
 import { HttpErrorFilter } from '../interceptors/error.filter';
 import { ApiResult } from '../interfaces/api-result.interface';
@@ -37,6 +38,7 @@ export class BaseController<T extends PortalCoreEntity> {
 
   @Get()
   async findAll(@Query() query): Promise<ApiResult> {
+    console.log('MODEL:::', this.Model.plural);
     if (query.paging === 'false') {
       const allContents: T[] = await this.baseService.findAll();
       return {
@@ -120,25 +122,60 @@ export class BaseController<T extends PortalCoreEntity> {
     @Param() params,
     @Body() updateEntityDto,
   ): Promise<ApiResult> {
-    const updateEntity = await this.baseService.findOneByUid(params.id);
-    if (updateEntity !== undefined) {
-      updateEntityDto['id'] = updateEntity['id'];
-      const resolvedEntityDTO: any = await this.baseService.EntityUidResolver(
-        updateEntityDto,
-        'PUT',
-      );
-      const payload = await this.baseService.update(resolvedEntityDTO);
-      if (payload) {
-        const data = await this.baseService.findOneByUid(params.id);
-        return res.status(res.statusCode).json({
-          message: `Item with id ${params.id} updated successfully.`,
-          payload: resolveResponse(data),
-        });
+    const user: any = req.user;
+    const userroles: any[] = user.userRoles.filter(
+      (role) => role.name === 'SUPER USER' || role.name === 'ADMIN',
+    );
+    const usercompanies: any[] = user.companies.filter(
+      (company) => company.id === params.id,
+    );
+    if (usercompanies.length > 0 || userroles.length > 0) {
+      if (this.Model.plural === 'companies') {
+        if (updateEntityDto.verified && userroles.length > 0) {
+          const updateEntity = await this.baseService.findOneByUid(params.id);
+          if (updateEntity !== undefined) {
+            updateEntityDto['id'] = updateEntity['id'];
+            const resolvedEntityDTO: any =
+              await this.baseService.EntityUidResolver(updateEntityDto, 'PUT');
+            const payload = await this.baseService.update(resolvedEntityDTO);
+            if (payload) {
+              const data = await this.baseService.findOneByUid(params.id);
+              return res.status(res.statusCode).json({
+                message: `Item with id ${params.id} updated successfully.`,
+                payload: resolveResponse(data),
+              });
+            }
+          } else {
+            return genericFailureResponse(res, params);
+          }
+        } else {
+          return res
+            .status(HttpStatus.FORBIDDEN)
+            .send('You have no permission to perform this action');
+        }
+      } else {
+        const updateEntity = await this.baseService.findOneByUid(params.id);
+        if (updateEntity !== undefined) {
+          updateEntityDto['id'] = updateEntity['id'];
+          const resolvedEntityDTO: any =
+            await this.baseService.EntityUidResolver(updateEntityDto, 'PUT');
+          const payload = await this.baseService.update(resolvedEntityDTO);
+          if (payload) {
+            const data = await this.baseService.findOneByUid(params.id);
+            return res.status(res.statusCode).json({
+              message: `Item with id ${params.id} updated successfully.`,
+              payload: resolveResponse(data),
+            });
+          }
+        } else {
+          return genericFailureResponse(res, params);
+        }
       }
     } else {
-      return genericFailureResponse(res, params);
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send('You have limited access to perform this action');
     }
-    return null;
   }
 
   @Delete(':id')
