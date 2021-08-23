@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -56,15 +57,15 @@ export class AuthController {
     return res.status(HttpStatus.OK).send(resolveResponse(user));
   }
 
-  @Get('companymetrics')
+  @Get('metrics')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
-  async companynmetrics(
+  async metrics(
     @Req() req: any,
     @Res() res: any,
     @Query() query: any,
   ): Promise<any> {
-    const user = await this.authService.userInfo(req.user.id, query.fields);
-    return res.status(HttpStatus.OK).send(resolveResponse(user));
+    const metrics = await this.authService.getMertics();
+    return res.status(HttpStatus.OK).send(metrics);
   }
 }

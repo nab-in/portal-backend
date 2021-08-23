@@ -13,6 +13,7 @@ import {
   getRelations,
   getSelections,
 } from '../../../core/helpers/get-fields.utility';
+import { Company } from 'src/modules/company/entities/company.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,8 @@ export class AuthService {
 
     @InjectRepository(Job)
     public jobrepository: Repository<Job>,
+    @InjectRepository(Company)
+    public companyrepository: Repository<Company>,
   ) {}
   async login(username: any, password: any): Promise<any> {
     const user: User = await User.verifyUser(username, password);
@@ -76,5 +79,21 @@ export class AuthService {
       select: getSelections(fields, metaData),
       relations: getRelations(fields, metaData),
     });
+  }
+  async getMertics(): Promise<any> {
+    const users = await this.userrepository.count();
+    const companies = await this.companyrepository.count();
+    const applications = Number(
+      (
+        await this.jobrepository.manager.query(
+          'SELECT COUNT(*) FROM APPLIEDJOB',
+        )
+      )[0]['count'],
+    );
+    const jobs = await this.jobrepository.count();
+    return {
+      message: 'Job Portal Admin Metrics',
+      metrics: { users, companies, applications, jobs },
+    };
   }
 }
