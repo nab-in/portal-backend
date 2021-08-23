@@ -66,7 +66,7 @@ export class AuthController {
     @Query() query: any,
   ): Promise<any> {
     const user: User = req.user;
-    const admin = user.userRoles.map(
+    const admin = user.userRoles.filter(
       (role) => role.name === 'SUPER USER' || role.name === 'ADMIN',
     );
     if (admin.length > 0) {

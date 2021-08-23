@@ -1,8 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { getConfiguration } from '../../core/utilities/systemConfigs';
 
 export class users1619179734907 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(
+      getConfiguration().email.adminpassword,
+      salt,
+    );
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION public.uid(
 	)
@@ -19,8 +25,8 @@ FROM generate_series(1,12)), '')
 $BODY$;
       ALTER TABLE public."user"
     OWNER to postgres;
-INSERT INTO public."user"(uid,created,lastupdated,firstname,email,username,lastname,password,verified,enabled,SALT) 
-VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','$2b$10$OuJ.NcPd0yryT7mE3sgbcuousQ7Wn5GmK0C.LvK7HdoYAPL/.0dxK',true,true,${await bcrypt.genSalt()})
+INSERT INTO public."user"(uid,created,lastupdated,firstname,email,username,lastname,password,verified,enabled,salt,dp) 
+VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','${hash}',true,true,'${salt}', 'dp.png')
     `);
     await queryRunner.query(
       'ALTER TABLE APPLIEDJOB ADD COLUMN ACCEPTED BOOLEAN',
@@ -30,7 +36,7 @@ VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','$2b$10$
     );
     await queryRunner.query('ALTER TABLE APPLIEDJOB ADD COLUMN DATE DATE');
     await queryRunner.query(
-      'ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  VARYING CHARACTER(255)',
+      'ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  CHARACTER VARYING(255)',
     );
     await queryRunner.query(
       "INSERT INTO USERROLE(uid,name) values(UID(), 'SUPER USER')",

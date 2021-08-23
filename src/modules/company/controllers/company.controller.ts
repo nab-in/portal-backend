@@ -83,7 +83,8 @@ export class CompanyController extends BaseController<Company> {
     const userCompany = user.companies.filter(
       (company) => company.id === param.id,
     );
-    if (userCompany.length > 0) {
+    const admins = user.userRoles.filter((role) => role.name === 'SUPER USER');
+    if (userCompany.length > 0 || admins.length > 0) {
       const company = await this.service.findOneByUid(param.id);
       if (company) {
         const metrics = await this.service.companyMetrics({ company });
