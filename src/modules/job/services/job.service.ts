@@ -23,7 +23,7 @@ export class JobService extends BaseService<Job> {
     return sessionUser;
   }
   async apply({ job, user }): Promise<{ message: string }> {
-    const query = `INSERT INTO APPLIEDJOB(USERId, JOBID) VALUES(${user.id}, ${job.id})`;
+    const query = `INSERT INTO APPLIEDJOB(CREATED, USERId, JOBID) VALUES(NOW(),${user.id}, ${job.id})`;
     await this.userrepository.manager.query(query);
     return {
       message: `You have successfully applied to with name <${job.name}>`,

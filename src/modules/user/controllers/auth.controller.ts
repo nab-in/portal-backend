@@ -70,7 +70,7 @@ export class AuthController {
       (role) => role.name === 'SUPER USER' || role.name === 'ADMIN',
     );
     if (admin.length > 0) {
-      const metrics = await this.authService.getMertics();
+      const metrics = await this.authService.getMertics(query);
       return res.status(HttpStatus.OK).send(metrics);
     } else {
       return res
