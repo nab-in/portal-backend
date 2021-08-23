@@ -80,12 +80,20 @@ export class AuthService {
       relations: getRelations(fields, metaData),
     });
   }
-  async getCompany(uid: string): Promise<Company> {
-    const company = await this.companyrepository.findOne({ where: { uid } });
-    return company;
+  async getMertics(): Promise<any> {
+    const users = await this.userrepository.count();
+    const companies = await this.companyrepository.count();
+    const applications = Number(
+      (
+        await this.jobrepository.manager.query(
+          'SELECT COUNT(*) FROM APPLIEDJOB',
+        )
+      )[0]['count'],
+    );
+    const jobs = await this.jobrepository.count();
+    return {
+      message: 'Job Portal Admin Metrics',
+      metrics: { users, companies, applications, jobs },
+    };
   }
 }
-/*
-Companies:
-4. Total number of hired candidates
-*/
