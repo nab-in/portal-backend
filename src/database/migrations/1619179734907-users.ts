@@ -38,6 +38,9 @@ VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','${hash}
     await queryRunner.query(
       'ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  CHARACTER VARYING(255)',
     );
+
+    await queryRunner.query('ALTER TABLE APPLIEDJOB ADD COLUMN CREATED  DATE');
+
     await queryRunner.query(
       "INSERT INTO USERROLE(uid,name) values(UID(), 'SUPER USER')",
     );

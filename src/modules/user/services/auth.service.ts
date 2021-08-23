@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from '../../job/entities/job.entity';
-import { In, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import jwt_decode from 'jwt-decode';
 import {
@@ -80,20 +80,47 @@ export class AuthService {
       relations: getRelations(fields, metaData),
     });
   }
-  async getMertics(): Promise<any> {
-    const users = await this.userrepository.count();
-    const companies = await this.companyrepository.count();
-    const applications = Number(
-      (
-        await this.jobrepository.manager.query(
-          'SELECT COUNT(*) FROM APPLIEDJOB',
-        )
-      )[0]['count'],
-    );
-    const jobs = await this.jobrepository.count();
-    return {
-      message: 'Job Portal Admin Metrics',
-      metrics: { users, companies, applications, jobs },
-    };
+  async getMertics(query: { startDate: Date; endDate: Date }): Promise<any> {
+    if (Object.keys(query).length === 0) {
+      const users = await this.userrepository.count();
+      const companies = await this.companyrepository.count();
+      const applications = Number(
+        (
+          await this.jobrepository.manager.query(
+            'SELECT COUNT(*) FROM APPLIEDJOB',
+          )
+        )[0]['count'],
+      );
+      const jobs = await this.jobrepository.count();
+      return {
+        message: 'Job Portal Admin Metrics',
+        metrics: { users, companies, applications, jobs },
+      };
+    } else {
+      const date = new Date(query.startDate);
+      date.setDate(date.getDate() - 1);
+      const startdate = date.toISOString().split('T')[0];
+      const dates = new Date(query.endDate);
+      dates.setDate(dates.getDate() + 1);
+      const enddate = dates.toISOString().split('T')[0];
+      const users = await this.userrepository.count({
+        where: { created: Between(startdate, enddate) },
+      });
+      const companies = await this.companyrepository.count({
+        where: { created: Between(startdate, enddate) },
+      });
+      const applications = Number(
+        (
+          await this.jobrepository.manager.query(
+            `SELECT COUNT(*) FROM APPLIEDJOB WHERE CREATED >= '${startdate}' AND CREATED <='${enddate}'`,
+          )
+        )[0]['count'],
+      );
+      const jobs = await this.jobrepository.count();
+      return {
+        message: `Job Portal Admin Metrics from ${query.startDate} to ${query.endDate}`,
+        metrics: { users, companies, applications, jobs },
+      };
+    }
   }
 }
