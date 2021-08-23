@@ -19,6 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { query } from 'express';
 import * as fs from 'fs';
+import * as jwt from 'jsonwebtoken';
 import { diskStorage } from 'multer';
 import {
   editFileName,
@@ -38,6 +39,7 @@ import { Company } from '../../company/entities/company.entity';
 import { Job } from '../../job/entities/job.entity';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
+
 @Controller('api/' + User.plural)
 export class UserController {
   constructor(private service: UserService) {}
@@ -539,5 +541,41 @@ export class UserController {
   @Get(':imgpath/cv')
   seecv(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: getConfiguration().cv });
+  }
+  @Get('verify')
+  async verify(@Res() res: any, @Query() query: { id: string; token: string }) {
+    if (query.id && query.token) {
+      const user = await this.service.findOneByUid(query.id);
+      if (user) {
+        if (!user.verified) {
+          const secretKey = `${user.email} - ${user.created}`;
+          const decoded = jwt.verify(query.token, secretKey);
+          if (decoded['id'] === query.id) {
+            if (Date.now() >= decoded['exp'] * 1000) {
+              return res
+                .status(HttpStatus.OK)
+                .send('Your token has expired, please reverify');
+            } else {
+              user.verified = true;
+              await this.service.update(user);
+              return res
+                .status(HttpStatus.OK)
+                .send(
+                  `Hello <${user.firstname}> You have successfully verified your account. Enjoy Job Portal`,
+                );
+            }
+          } else {
+            return res.status(HttpStatus.OK).send('Invalid token');
+          }
+        } else {
+          return res
+            .status(HttpStatus.OK)
+            .send('Your account is already verified. Enjoy Job Portal');
+        }
+      } else {
+      }
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).send('Link is invalid');
+    }
   }
 }

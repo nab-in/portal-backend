@@ -1,14 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { getConfiguration } from '../../core/utilities/systemConfigs';
+import { systemConfig } from 'src/core/interfaces/system-config';
 
 export class users1619179734907 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const config: systemConfig = getConfiguration();
     const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(
-      getConfiguration().email.adminpassword,
-      salt,
-    );
+    const hash = await bcrypt.hash(config.email.adminpassword, salt);
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION public.uid(
 	)
@@ -26,7 +25,7 @@ $BODY$;
       ALTER TABLE public."user"
     OWNER to postgres;
 INSERT INTO public."user"(uid,created,lastupdated,firstname,email,username,lastname,password,verified,enabled,salt,dp) 
-VALUES(uid(),now(),now(),'Admin','portal@admin.portal','admin','Portal','${hash}',true,true,'${salt}', 'dp.png')
+VALUES(uid(),now(),now(),'Admin','${config.email.adminemail}','admin','Portal','${hash}',true,true,'${salt}', 'dp.png')
     `);
     await queryRunner.query(
       'ALTER TABLE APPLIEDJOB ADD COLUMN ACCEPTED BOOLEAN',

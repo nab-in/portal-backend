@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 import * as nodemailer from 'nodemailer';
 import { FindConditions, Repository, UpdateResult } from 'typeorm';
 import { PortalCoreEntity } from '../entities/portal.core.entity';
@@ -7,6 +8,7 @@ import { getWhereConditions } from '../helpers/get-where-conditions.utility';
 import { resolvedResponse } from '../helpers/resolve.payload';
 import { resolveWhere } from '../helpers/resolvewhere';
 import { newaccount } from '../helpers/templates/new-account';
+import { systemConfig } from '../interfaces/system-config';
 import { getConfiguration } from '../utilities/systemConfigs';
 
 @Injectable()
@@ -112,7 +114,8 @@ export class BaseService<T extends PortalCoreEntity> {
      * Send user email to verify themselves
      */
     if (this.Model.plural === 'users' && entity.email) {
-      const auth = getConfiguration().email.auth;
+      const config: systemConfig = getConfiguration();
+      const auth = config.email.auth;
       const transport = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -120,12 +123,21 @@ export class BaseService<T extends PortalCoreEntity> {
         requireTLS: true,
         auth,
       });
+      const id = savedEntity['uid'];
+      const secretKey = `${savedEntity['email']} - ${savedEntity['created']}`;
+
+      const token = jwt.sign({ id }, secretKey, {
+        expiresIn: 604800,
+      });
+      console.log(JSON.stringify(token));
+      const url =
+        config.serverurl + `/api/users/verify?token=${token}&id=${id}`;
       const message = {
         from: `Job Portal <${auth.user}> `,
         to: `"${savedEntity['firstname']}" <${savedEntity['email']}>`,
         subject: 'New Job Portal Account',
         text: `Hello ${savedEntity['firstname']}.`,
-        html: `${newaccount(savedEntity, 'url')}`,
+        html: `${newaccount(savedEntity, url)}`,
       };
       transport.sendMail(message, function (error) {
         if (error) {
