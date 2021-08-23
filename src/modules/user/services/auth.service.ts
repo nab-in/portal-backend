@@ -13,6 +13,7 @@ import {
   getRelations,
   getSelections,
 } from '../../../core/helpers/get-fields.utility';
+import { Company } from 'src/modules/company/entities/company.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,8 @@ export class AuthService {
 
     @InjectRepository(Job)
     public jobrepository: Repository<Job>,
+    @InjectRepository(Company)
+    public companyrepository: Repository<Company>,
   ) {}
   async login(username: any, password: any): Promise<any> {
     const user: User = await User.verifyUser(username, password);
@@ -77,4 +80,12 @@ export class AuthService {
       relations: getRelations(fields, metaData),
     });
   }
+  async getCompany(uid: string): Promise<Company> {
+    const company = await this.companyrepository.findOne({ where: { uid } });
+    return company;
+  }
 }
+/*
+Companies:
+4. Total number of hired candidates
+*/

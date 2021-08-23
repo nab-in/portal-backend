@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -56,15 +57,23 @@ export class AuthController {
     return res.status(HttpStatus.OK).send(resolveResponse(user));
   }
 
-  @Get('companymetrics')
+  /*@Get(':id/companymetrics')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
   async companynmetrics(
     @Req() req: any,
     @Res() res: any,
     @Query() query: any,
+    @Param() param: any,
   ): Promise<any> {
-    const user = await this.authService.userInfo(req.user.id, query.fields);
-    return res.status(HttpStatus.OK).send(resolveResponse(user));
-  }
+    const company = await this.authService.getCompany(param.id);
+    if (company) {
+      const metrics = await this.authService.companyMetrics({ company });
+      return res.status(HttpStatus.OK).send(resolveResponse(metrics));
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send(`Company with ID ${param.id} could not be found`);
+    }
+  }*/
 }

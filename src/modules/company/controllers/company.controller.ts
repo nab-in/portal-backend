@@ -1,10 +1,15 @@
 import {
   Controller,
+  Get,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
+  Res,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +19,7 @@ import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import { BaseController } from 'src/core/controllers/base.controller';
 import { editFileName, imageFileFilter } from 'src/core/helpers/sanitize-image';
+import { HttpErrorFilter } from 'src/core/interceptors/error.filter';
 import { getConfiguration } from 'src/core/utilities/systemConfigs';
 import { Company } from '../entities/company.entity';
 import { CompanyService } from '../services/company.service';
@@ -61,6 +67,25 @@ export class CompanyController extends BaseController<Company> {
       }
     } catch (e) {
       throw new Error(e.message);
+    }
+  }
+  @Get(':id/companymetrics')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async companynmetrics(
+    @Req() req: any,
+    @Res() res: any,
+    @Query() query: any,
+    @Param() param: any,
+  ): Promise<any> {
+    const company = await this.service.findOneByUid(param.id);
+    if (company) {
+      const metrics = await this.service.companyMetrics({ company });
+      return res.status(HttpStatus.OK).send(metrics);
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send(`Company with ID ${param.id} could not be found`);
     }
   }
 }
