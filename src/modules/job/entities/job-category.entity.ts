@@ -1,6 +1,7 @@
 import {
   BeforeInsert,
   BeforeUpdate,
+  Column,
   Entity,
   ManyToMany,
   ManyToOne,
@@ -17,6 +18,12 @@ import { Job } from './job.entity';
 @Tree('materialized-path')
 export class JobCategory extends NamedEntity {
   static plural = 'jobCategories';
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'verified',
+  })
+  verified: string;
 
   @TreeParent()
   parent: JobCategory;
