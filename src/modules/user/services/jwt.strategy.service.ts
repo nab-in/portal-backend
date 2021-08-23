@@ -22,13 +22,13 @@ export class JwtPassportStrategy extends PassportStrategy(Strategy) {
       if (payload.email) {
         user = await this.userRepository.findOne({
           where: { email: payload.email },
-          relations: ['userRoles'],
+          relations: ['userRoles', 'companies'],
         });
       }
       if (payload.username) {
         user = await this.userRepository.findOne({
           where: { username: payload.username },
-          relations: ['userRoles'],
+          relations: ['userRoles', 'companies'],
         });
       }
       if (!user) {

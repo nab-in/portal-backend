@@ -197,12 +197,12 @@ export class User extends NamedEntity {
     if (isEmail) {
       user = await User.findOne({
         where: { email: username },
-        relations: ['userRoles'],
+        relations: ['userRoles', 'companies'],
       });
     } else {
       user = await User.findOne({
         where: { username },
-        relations: ['userRoles'],
+        relations: ['userRoles', 'companies'],
       });
     }
     if (
