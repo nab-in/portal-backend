@@ -21,6 +21,7 @@ import { query } from 'express';
 import * as fs from 'fs';
 import * as jwt from 'jsonwebtoken';
 import { diskStorage } from 'multer';
+import { systemConfig } from 'src/core/interfaces/system-config';
 import {
   editFileName,
   filesFilter,
@@ -544,6 +545,7 @@ export class UserController {
   }
   @Get('verify')
   async verify(@Res() res: any, @Query() query: { id: string; token: string }) {
+    const config: systemConfig = getConfiguration();
     if (query.id && query.token) {
       const user = await this.service.findOneByUid(query.id);
       if (user) {
@@ -568,9 +570,7 @@ export class UserController {
             return res.status(HttpStatus.OK).send('Invalid token');
           }
         } else {
-          return res
-            .status(HttpStatus.OK)
-            .send('Your account is already verified. Enjoy Job Portal');
+          return res.redirect(config.serverurl);
         }
       } else {
       }
