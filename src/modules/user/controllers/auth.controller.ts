@@ -55,4 +55,16 @@ export class AuthController {
     const user = await this.authService.userInfo(req.user.id, query.fields);
     return res.status(HttpStatus.OK).send(resolveResponse(user));
   }
+
+  @Get('companymetrics')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async companynmetrics(
+    @Req() req: any,
+    @Res() res: any,
+    @Query() query: any,
+  ): Promise<any> {
+    const user = await this.authService.userInfo(req.user.id, query.fields);
+    return res.status(HttpStatus.OK).send(resolveResponse(user));
+  }
 }

@@ -29,9 +29,32 @@ export class JobService extends BaseService<Job> {
       message: `You have successfully applied to with name <${job.name}>`,
     };
   }
-  async applicants({ job, size, page }): Promise<any> {
-    const query = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB WHERE JOBID=${job.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
-    const jobApplicants = await this.repository.manager.query(query);
+  async applicants({ job, size, page, query }): Promise<any> {
+    let sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB WHERE JOBID=${job.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
+    if (Object.keys(query).length > 0) {
+      if (query.startDate && query.endDate) {
+        const date = new Date(query.startDate);
+        date.setDate(date.getDate() - 1);
+        const startdate = date.toISOString().split('T')[0];
+        const dates = new Date(query.endDate);
+        dates.setDate(dates.getDate() + 1);
+        const enddate = dates.toISOString().split('T')[0];
+        sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE >= '${startdate}' AND A.DATE <='${enddate}') AS TBL OFFSET ${page} LIMIT ${size}`;
+      }
+      if (query.startDtae && !query.endDate) {
+        const date = new Date(query.startDate);
+        date.setDate(date.getDate() - 1);
+        const startdate = date.toISOString().split('T')[0];
+        sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE >= '${startdate}') AS TBL OFFSET ${page} LIMIT ${size}`;
+      }
+      if (query.endDtae && !query.startDate) {
+        const dates = new Date(query.endDate);
+        dates.setDate(dates.getDate() + 1);
+        const enddate = dates.toISOString().split('T')[0];
+        sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE <='${enddate}') AS TBL OFFSET ${page} LIMIT ${size}`;
+      }
+    }
+    const jobApplicants = await this.repository.manager.query(sql);
     if (jobApplicants.length > 0) {
       let applicants = jobApplicants.map(async (data: { userid: any }) => {
         const user = await this.userrepository.findOne({

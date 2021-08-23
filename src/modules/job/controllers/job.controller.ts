@@ -75,6 +75,7 @@ export class JobController extends BaseController<Job> {
       job,
       page: pagerDetails.page - 1,
       size: pagerDetails.pageSize,
+      query,
     });
     if (applicants !== undefined) {
       const pager = {
