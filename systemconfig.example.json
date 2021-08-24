@@ -30,7 +30,9 @@
       "username": "<email>",
       "password": "<password>"
     },
-    "smtp": "smtp.gmail.com"
+    "smtp": "smtp.gmail.com",
+    "adminpassword": "Default Admin Password",
+    "adminemail": "<Default Admin Email>"
   },
   "serverport": 7000,
   "user": "./files/profile/user",
