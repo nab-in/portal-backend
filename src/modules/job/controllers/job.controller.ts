@@ -239,4 +239,27 @@ export class JobController extends BaseController<Job> {
     const saved = await this.service.removeJob({ job: job.id, user: user.id });
     return res.status(HttpStatus.OK).send(saved);
   }
+  @Get(':id/applications/:user')
+  async getJobApplications(
+    @Param() params: { id: string; user: string },
+    @Res() res: any,
+  ) {
+    const job = await this.service.findOneByUid(params.id);
+    if (job) {
+      const user = await this.service.findUser(params.user);
+      if (user) {
+        let application = await this.service.findApplications({ job, user });
+        application = { ...application, user, job };
+        return res.status(HttpStatus.OK).send(resolveResponse(application));
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send(`User with ID ${params.user} could not be found`);
+      }
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send(`Job with ID ${params.id} could not be found`);
+    }
+  }
 }

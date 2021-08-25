@@ -70,6 +70,11 @@ export class JobService extends BaseService<Job> {
       return [[], 0];
     }
   }
+  async findApplications({ job, user }): Promise<any> {
+    const sql = `SELECT * FROM APPLIEDJOB WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    const application = await this.repository.manager.query(sql);
+    return application;
+  }
   async revoke({ job, user }): Promise<{ message: string }> {
     const query = `DELETE FROM APPLIEDJOB WHERE USERID = ${user.id} AND JOBID=${job.id}`;
     await this.userrepository.manager.query(query);
