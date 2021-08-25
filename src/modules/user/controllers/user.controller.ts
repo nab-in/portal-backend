@@ -421,23 +421,31 @@ export class UserController {
     }
   }
 
-  /* @Get(':id')
+  @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   async findOneUser(
     @Res() res: any,
     @Param() params,
     @Query() query,
+    @Req() req: any,
   ): Promise<any> {
-    const results = await this.service.findOneByUid(params.id, query.fields);
-    if (results) {
-      return getSuccessResponse(res, resolveResponse(results));
+    const user: User = req.user;
+    if (user.userRoles.length > 0 || user.companies.length > 0) {
+      const results = await this.service.findOneByUid(params.id, query.fields);
+      if (results) {
+        return getSuccessResponse(res, resolveResponse(results));
+      } else {
+        return res.status(HttpStatus.NOT_FOUND).send({
+          message: `Item with identifier ${params.id} could not be found`,
+        });
+      }
     } else {
-      return res.status(HttpStatus.NOT_FOUND).send({
-        message: `Item with identifier ${params.id} could not be found`,
-      });
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send({ error: 'You have no access to this endpoint' });
     }
-  }*/
+  }
   @Put('passwordupdate')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
