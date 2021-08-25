@@ -240,6 +240,8 @@ export class JobController extends BaseController<Job> {
     return res.status(HttpStatus.OK).send(saved);
   }
   @Get(':id/applications/:user')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
   async getJobApplications(
     @Param() params: { id: string; user: string },
     @Res() res: any,
