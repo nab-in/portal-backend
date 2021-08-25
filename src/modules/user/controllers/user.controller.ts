@@ -465,16 +465,34 @@ export class UserController {
     @Req() req: any,
     @Res() res: any,
     @Param() params,
-    @Body() updateEntityDto,
+    @Body() updateEntityDto: User,
   ): Promise<User> {
     const updateEntity = await this.service.findOneByUid(req.user.id);
     if (updateEntity !== undefined) {
-      const verifyOldPassword = await User.validatePassword(
-        updateEntityDto.userpassword,
-        updateEntity.salt,
-        updateEntity.password,
-      );
-      if (verifyOldPassword) {
+      if (
+        updateEntityDto.username ||
+        updateEntityDto.email ||
+        updateEntityDto.password
+      ) {
+        const verifyOldPassword = await User.validatePassword(
+          updateEntityDto['userpassword'],
+          updateEntity.salt,
+          updateEntity.password,
+        );
+        if (verifyOldPassword) {
+          updateEntityDto['id'] = updateEntity['id'];
+          const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+            updateEntityDto,
+            'PUT',
+          );
+          await this.service.update(resolvedEntityDTO);
+          const data = await this.service.findOneByUid(req.user.id);
+          return res.status(HttpStatus.OK).send({
+            message: `Item with id ${req.user.id} updated successfully.`,
+            payload: resolveResponse(data),
+          });
+        }
+      } else {
         updateEntityDto['id'] = updateEntity['id'];
         const resolvedEntityDTO: any = await this.service.EntityUidResolver(
           updateEntityDto,
