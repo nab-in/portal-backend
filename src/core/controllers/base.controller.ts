@@ -131,10 +131,26 @@ export class BaseController<T extends PortalCoreEntity> {
       const usercompanies: any[] = user.companies.filter(
         (company: { id: any }) => company.id === params.id,
       );
-      if (usercompanies.length > 0 || userroles.length > 0) {
+      let userCompanyJob = [];
+      if (
+        this.Model.plural === 'companies' ||
+        this.Model.plural === 'jobcategory' ||
+        this.Model.plural === 'jobs'
+      ) {
+        const job = await this.baseService.findOneByUid(
+          params.id,
+          'createdBy,company',
+        );
+
+        if (job && job['company']) {
+          userCompanyJob = user.companies.filter(
+            (company: { id: string }) => company.id === job['company']['uid'],
+          );
+        }
         if (
-          this.Model.plural === 'companies' ||
-          this.Model.plural === 'jobcategory'
+          usercompanies.length > 0 ||
+          userroles.length > 0 ||
+          userCompanyJob.length > 0
         ) {
           if (updateEntityDto.verified && userroles.length > 0) {
             updateEntityDto['id'] = updateEntity['id'];
@@ -166,22 +182,24 @@ export class BaseController<T extends PortalCoreEntity> {
               .send('You have no permission to perform this action');
           }
         } else {
-          updateEntityDto['id'] = updateEntity['id'];
-          const resolvedEntityDTO: any =
-            await this.baseService.EntityUidResolver(updateEntityDto, 'PUT');
-          const payload = await this.baseService.update(resolvedEntityDTO);
-          if (payload) {
-            const data = await this.baseService.findOneByUid(params.id);
-            return res.status(res.statusCode).json({
-              message: `Item with id ${params.id} updated successfully.`,
-              payload: resolveResponse(data),
-            });
-          }
+          return res
+            .status(HttpStatus.FORBIDDEN)
+            .send('You have no permission to perform this action');
         }
       } else {
-        return res
-          .status(HttpStatus.FORBIDDEN)
-          .send('You have limited access to perform this action');
+        updateEntityDto['id'] = updateEntity['id'];
+        const resolvedEntityDTO: any = await this.baseService.EntityUidResolver(
+          updateEntityDto,
+          'PUT',
+        );
+        const payload = await this.baseService.update(resolvedEntityDTO);
+        if (payload) {
+          const data = await this.baseService.findOneByUid(params.id);
+          return res.status(res.statusCode).json({
+            message: `Item with id ${params.id} updated successfully.`,
+            payload: resolveResponse(data),
+          });
+        }
       }
     } else {
       return res

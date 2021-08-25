@@ -505,10 +505,8 @@ export class UserController {
     const user: User = req.user;
     if (
       user.userRoles &&
-      user.userRoles.map(
-        (user) =>
-          user.name.toLowerCase().includes('super') ||
-          user.name.toLowerCase().includes('admin'),
+      user.userRoles.filter(
+        (user) => user.name === 'SUPER USER' || user.name === 'ADMIN',
       ).length > 0
     ) {
       const updateEntity = await this.service.findOneByUid(params.id);

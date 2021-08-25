@@ -124,24 +124,33 @@ export class JobController extends BaseController<Job> {
   async createJobs(
     @Req() req: any,
     @Res() res: any,
-    @Body() createEntityDto,
+    @Body() createEntityDto: Job,
     @UploadedFile() file,
   ): Promise<any> {
-    const user = req.user;
-    const resolvedEntity = await this.service.EntityUidResolver(
-      createEntityDto,
-      user,
-      'POST',
+    const user: User = req.user;
+    const userCompany = user.companies.filter(
+      (company) => company.id === createEntityDto.company.id,
     );
-    if (file && file.filename) {
-      resolvedEntity['attachment'] = file.filename;
-    }
+    if (userCompany.length > 0) {
+      const resolvedEntity = await this.service.EntityUidResolver(
+        createEntityDto,
+        user,
+        'POST',
+      );
+      if (file && file.filename) {
+        resolvedEntity['attachment'] = file.filename;
+      }
 
-    const createdEntity = await this.service.create(resolvedEntity);
-    if (createdEntity !== undefined) {
-      return postSuccessResponse(res, resolveResponse(createdEntity));
+      const createdEntity = await this.service.create(resolvedEntity);
+      if (createdEntity !== undefined) {
+        return postSuccessResponse(res, resolveResponse(createdEntity));
+      } else {
+        return genericFailureResponse(res);
+      }
     } else {
-      return genericFailureResponse(res);
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .send('You have no permission to perform this action');
     }
   }
   @Delete(':job/revoke')
