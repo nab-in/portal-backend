@@ -467,13 +467,13 @@ export class UserController {
     @Param() params,
     @Body() updateEntityDto: User,
   ): Promise<User> {
-    const updateEntity = await this.service.findOneByUid(req.user.id);
-    if (updateEntity !== undefined) {
-      if (
-        updateEntityDto.username ||
-        updateEntityDto.email ||
-        updateEntityDto.password
-      ) {
+    if (
+      updateEntityDto.username ||
+      updateEntityDto.email ||
+      updateEntityDto.password
+    ) {
+      const updateEntity = await this.service.findOneByUid(req.user.id);
+      if (updateEntity !== undefined) {
         const verifyOldPassword = await User.validatePassword(
           updateEntityDto['userpassword'],
           updateEntity.salt,
@@ -491,24 +491,27 @@ export class UserController {
             message: `Item with id ${req.user.id} updated successfully.`,
             payload: resolveResponse(data),
           });
+        } else {
+          return res.status(HttpStatus.FORBIDDEN).send('Incorrect password');
         }
       } else {
-        updateEntityDto['id'] = updateEntity['id'];
-        const resolvedEntityDTO: any = await this.service.EntityUidResolver(
-          updateEntityDto,
-          'PUT',
-        );
-        await this.service.update(resolvedEntityDTO);
-        const data = await this.service.findOneByUid(req.user.id);
-        return res.status(HttpStatus.OK).send({
-          message: `Item with id ${req.user.id} updated successfully.`,
-          payload: resolveResponse(data),
-        });
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('User with such token is unavailable');
       }
     } else {
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .send('User with such token is unavailable');
+      const updateEntity = await this.service.findOneByUid(req.user.id);
+      updateEntityDto['id'] = updateEntity['id'];
+      const resolvedEntityDTO: any = await this.service.EntityUidResolver(
+        updateEntityDto,
+        'PUT',
+      );
+      await this.service.update(resolvedEntityDTO);
+      const data = await this.service.findOneByUid(req.user.id);
+      return res.status(HttpStatus.OK).send({
+        message: `Item with id ${req.user.id} updated successfully.`,
+        payload: resolveResponse(data),
+      });
     }
   }
   @Put('id')
