@@ -28,30 +28,21 @@ INSERT INTO public."user"(uid,created,lastupdated,firstname,email,username,lastn
 VALUES(uid(),now(),now(),'Admin','${config.email.adminemail}','admin','Portal','${hash}',true,true,'${salt}', 'dp.png')
     `);
     await queryRunner.query(
-      'ALTER TABLE APPLIEDJOB ADD COLUMN ACCEPTED BOOLEAN',
-    );
-    await queryRunner.query(
-      'ALTER TABLE APPLIEDJOB ADD COLUMN INTERVIEW BOOLEAN',
-    );
-    await queryRunner.query(
-      'ALTER TABLE JOBCATEGORY ALTER COLUMN NAME SET NOT NULL',
-    );
-    await queryRunner.query(
-      'ALTER TABLE JOBCATEGORY ADD CONSTRAINT UQ_JOBCATEGORY_NAME UNIQUE(name)',
-    );
-    await queryRunner.query('ALTER TABLE APPLIEDJOB ADD COLUMN DATE DATE');
-    await queryRunner.query(
-      'ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  CHARACTER VARYING(255)',
-    );
-
-    await queryRunner.query('ALTER TABLE APPLIEDJOB ADD COLUMN CREATED  DATE');
-
-    await queryRunner.query(
-      "INSERT INTO USERROLE(uid,name) values(UID(), 'SUPER USER')",
-    );
-
-    await queryRunner.query(
-      'INSERT INTO USERROLESMEMBER(userid,userroleid) values(1, 1)',
+      `
+      ALTER TABLE APPLIEDJOB ADD COLUMN ACCEPTED BOOLEAN;
+      ALTER TABLE "user" DROP COLUMN NAME;
+      ALTER TABLE APPLIEDJOB ADD COLUMN INTERVIEW BOOLEAN;
+      ALTER TABLE JOBCATEGORY ALTER COLUMN NAME SET NOT NULL;
+      ALTER TABLE JOBCATEGORY ADD CONSTRAINT UQ_JOBCATEGORY_NAME UNIQUE(name);
+      ALTER TABLE USERROLE ADD CONSTRAINT UQ_USERROLE_NAME UNIQUE(name);
+      ALTER TABLE APPLIEDJOB ADD COLUMN DATE DATE;
+      ALTER TABLE APPLIEDJOB ADD COLUMN LOCATION  CHARACTER VARYING(255);
+      ALTER TABLE APPLIEDJOB ADD COLUMN CREATED  DATE;
+      INSERT INTO USERROLE(uid,name) values(UID(), 'SUPER USER');
+      INSERT INTO USERROLE(uid,name) values(UID(), 'ADMIN');
+      INSERT INTO USERROLESMEMBER(userid,userroleid) values(1, 1);
+      INSERT INTO USERROLESMEMBER(userid,userroleid) values(1, 2)
+      `,
     );
   }
 

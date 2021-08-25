@@ -13,13 +13,6 @@ import { User } from '../../user/entities/user.entity';
 export class UserRole extends NamedEntity {
   static plural = 'userRoles';
 
-  @Column('varchar', {
-    nullable: false,
-    name: 'name',
-    unique: true,
-  })
-  name: string;
-
   @ManyToMany(() => User, (user) => user.userRoles, {
     cascade: false,
     nullable: true,
