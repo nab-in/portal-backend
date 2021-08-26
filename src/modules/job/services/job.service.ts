@@ -18,7 +18,6 @@ export class JobService extends BaseService<Job> {
   async findUser(uid: string): Promise<User> {
     const sessionUser = await this.userrepository.findOne({
       where: { uid },
-      select: ['id'],
     });
     return sessionUser;
   }

@@ -251,7 +251,7 @@ export class JobController extends BaseController<Job> {
       const user = await this.service.findUser(params.user);
       if (user) {
         let application = await this.service.findApplications({ job, user });
-        application = { ...application, user, job };
+        application = { ...application[0], user, job };
         return res.status(HttpStatus.OK).send(resolveResponse(application));
       } else {
         return res
