@@ -246,7 +246,10 @@ export class JobController extends BaseController<Job> {
     @Param() params: { id: string; user: string },
     @Res() res: any,
   ) {
-    const job = await this.service.findOneByUid(params.id);
+    const job = await this.service.findOneByUid(
+      params.id,
+      'id,name,created,lastupdated,description,company',
+    );
     if (job) {
       const user = await this.service.findUser(params.user);
       if (user) {
