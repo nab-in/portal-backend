@@ -267,4 +267,32 @@ export class JobController extends BaseController<Job> {
         .send(`Job with ID ${params.id} could not be found`);
     }
   }
+  @Get(':id/saves/:user')
+  @UseFilters(new HttpErrorFilter())
+  @UseGuards(AuthGuard('jwt'))
+  async getSaves(
+    @Param() params: { id: string; user: string },
+    @Res() res: any,
+  ) {
+    const job = await this.service.findOneByUid(
+      params.id,
+      'id,name,created,lastupdated,description,company',
+    );
+    if (job) {
+      const user = await this.service.findUser(params.user);
+      if (user) {
+        let application = await this.service.findApplications({ job, user });
+        application = { ...application[0], user, job };
+        return res.status(HttpStatus.OK).send(resolveResponse(application));
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send(`User with ID ${params.user} could not be found`);
+      }
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .send(`Job with ID ${params.id} could not be found`);
+    }
+  }
 }

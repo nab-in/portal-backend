@@ -74,6 +74,11 @@ export class JobService extends BaseService<Job> {
     const application = await this.repository.manager.query(sql);
     return application;
   }
+  async findSaves({ job, user }): Promise<any> {
+    const sql = `SELECT * FROM SAVEDJOB WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    const application = await this.repository.manager.query(sql);
+    return application;
+  }
   async revoke({ job, user }): Promise<{ message: string }> {
     const query = `DELETE FROM APPLIEDJOB WHERE USERID = ${user.id} AND JOBID=${job.id}`;
     await this.userrepository.manager.query(query);
@@ -82,7 +87,7 @@ export class JobService extends BaseService<Job> {
     };
   }
   async saveJob({ user, job }): Promise<{ message: string }> {
-    const sql = `INSERT INTO SAVEDJOB(USERID,JOBID) VALUES(${user.id}, ${job.id})`;
+    const sql = `INSERT INTO SAVEDJOB(CREATED,USERID,JOBID) VALUES(NOW(), ${user.id}, ${job.id})`;
     try {
       await this.repository.manager.query(sql);
       return { message: `Job with name <${job.name}> saved successfully` };
