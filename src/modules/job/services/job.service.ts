@@ -107,4 +107,9 @@ export class JobService extends BaseService<Job> {
     await this.repository.manager.query(sql);
     return { message: `Job removed successfully` };
   }
+  async getUserJobs({ user, table, job }): Promise<any> {
+    const sql = `SELECT * FROM ${table} A WHERE A.JOBID=${job.id} AND A.USERID=${user.id}`;
+    const data = await this.repository.manager.query(sql);
+    return data
+  }
 }

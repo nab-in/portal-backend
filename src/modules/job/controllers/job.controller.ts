@@ -253,9 +253,20 @@ export class JobController extends BaseController<Job> {
     if (job) {
       const user = await this.service.findUser(params.user);
       if (user) {
-        let application = await this.service.findApplications({ job, user });
-        application = { ...application[0], user, job };
-        return res.status(HttpStatus.OK).send(resolveResponse(application));
+        const data: any[] = await this.service.getUserJobs({
+          user,
+          job,
+          table: 'APPLIEDJOB',
+        });
+        if (data.length > 0) {
+          let application = await this.service.findApplications({ job, user });
+          application = { ...application[0], user, job };
+          return res.status(HttpStatus.OK).send(resolveResponse(application));
+        } else {
+          return res
+            .status(HttpStatus.NOT_FOUND)
+            .send(`You have no application for this job`);
+        }
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
@@ -281,9 +292,20 @@ export class JobController extends BaseController<Job> {
     if (job) {
       const user = await this.service.findUser(params.user);
       if (user) {
-        let application = await this.service.findApplications({ job, user });
-        application = { ...application[0], user, job };
-        return res.status(HttpStatus.OK).send(resolveResponse(application));
+        const data: any[] = await this.service.getUserJobs({
+          user,
+          job,
+          table: 'SAVEDJOB',
+        });
+        if (data.length > 0) {
+          let application = await this.service.findSaves({ job, user });
+          application = { ...application[0], user, job };
+          return res.status(HttpStatus.OK).send(resolveResponse(application));
+        } else {
+          return res
+            .status(HttpStatus.NOT_FOUND)
+            .send(`You have not saved this job yet`);
+        }
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
