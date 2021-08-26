@@ -42,11 +42,14 @@ export class UserService extends BaseService<User> {
 
   async findSavedJobs({ user, page, size }): Promise<any> {
     const query = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT JOBID FROM SAVEDJOB WHERE USERID=${user.id}) AS TBL OFFSET ${page} LIMIT ${size}`;
-    const job = await this.repository.manager.query(query);
-    if (job.lenght > 0) {
-      const appliedJobs = job.map((job: { jobid: any }) => job.jobid);
-      const total = job && job[0].count ? job[0].count : 0;
-      const jobs = this.jobrepository.find({ where: { id: In(appliedJobs) } });
+    const savedjob: any = await this.repository.manager.query(query);
+    if (savedjob.length > 0) {
+      const appliedJobs = savedjob.map((job: { jobid: any }) => job.jobid);
+      const total = savedjob && savedjob[0].count ? savedjob[0].count : 0;
+      const jobs = await this.jobrepository.find({
+        where: { id: In(appliedJobs) },
+        relations: ['company'],
+      });
       return [jobs, total];
     } else {
       return [[], 0];
