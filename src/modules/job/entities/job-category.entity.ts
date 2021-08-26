@@ -1,3 +1,4 @@
+import { SubScriber } from 'src/modules/user/entities/subscribers.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -33,6 +34,11 @@ export class JobCategory extends NamedEntity {
 
   @ManyToMany(() => Job, (job) => job.categories, { nullable: true })
   jobs: Job[];
+
+  @ManyToMany(() => SubScriber, (subscribers) => subscribers.jobCategories, {
+    nullable: true,
+  })
+  subscribers: SubScriber[];
   @BeforeInsert()
   beforeUpdateTransaction() {
     this.created = new Date();

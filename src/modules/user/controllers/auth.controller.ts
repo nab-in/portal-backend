@@ -78,4 +78,10 @@ export class AuthController {
         .send('You do not have access to this resource');
     }
   }
+  @Post('subscribers')
+  @UseFilters(new HttpErrorFilter())
+  async subscribe(
+    @Res() res: any,
+    @Body() bod: { name: string; email: string },
+  ): Promise<any> {}
 }
