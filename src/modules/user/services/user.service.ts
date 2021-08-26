@@ -27,6 +27,7 @@ export class UserService extends BaseService<User> {
       let jobs = appliedJobs.map(async (data: { jobid: any }) => {
         const jobData = await this.jobrepository.findOne({
           where: { id: data.jobid },
+          relations: ['company'],
         });
         return { ...data, ...jobData };
       });
