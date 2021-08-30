@@ -128,6 +128,10 @@ export class JobController extends BaseController<Job> {
     @UploadedFile() file,
   ): Promise<any> {
     const user: User = req.user;
+    Object.keys(createEntityDto).forEach((key) => {
+      (createEntityDto[key] === null || createEntityDto[key] === '') &&
+        delete createEntityDto[key];
+    });
     const userCompany = user.companies.filter(
       (company) => company.id === createEntityDto.company.id,
     );
