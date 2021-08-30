@@ -51,6 +51,10 @@ export class UserController {
     @Res() res: any,
     @Body() createEntityDto,
   ): Promise<any> {
+    Object.keys(createEntityDto).forEach((key) => {
+      (createEntityDto[key] === null || createEntityDto[key] === '') &&
+        delete createEntityDto[key];
+    });
     const resolvedEntity = await this.service.EntityUidResolver(
       createEntityDto,
     );
