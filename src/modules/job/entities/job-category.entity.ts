@@ -24,7 +24,7 @@ export class JobCategory extends NamedEntity {
     nullable: true,
     name: 'verified',
   })
-  verified: string;
+  verified: boolean;
 
   @TreeParent()
   parent: JobCategory;
@@ -44,6 +44,7 @@ export class JobCategory extends NamedEntity {
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
+    this.verified = false;
   }
 
   @BeforeUpdate()

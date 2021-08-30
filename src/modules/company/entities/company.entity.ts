@@ -54,7 +54,7 @@ export class Company extends NamedEntity {
     nullable: true,
     name: 'verified',
   })
-  verified: string;
+  verified: boolean;
 
   @Column('varchar', {
     nullable: true,
@@ -91,6 +91,7 @@ export class Company extends NamedEntity {
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();
+    this.verified = false;
   }
 
   @BeforeUpdate()
