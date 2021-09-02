@@ -47,7 +47,11 @@ export class CompanyController extends BaseController<Company> {
     @Param() params: { id: string },
   ) {
     try {
-      const path: string = '/api/Companies/' + file.filename + '/logo';
+      const path: string =
+        getConfiguration().serverurl +
+        '/api/Companies/' +
+        file.filename +
+        '/logo';
       const response = {
         path,
         message: 'Company Logo saved successfully',
