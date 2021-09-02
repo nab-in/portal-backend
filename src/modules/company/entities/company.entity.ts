@@ -86,16 +86,15 @@ export class Company extends NamedEntity {
   lastUpdatedBy: User;
 
   @BeforeInsert()
-  beforeUpdateTransaction() {
+  beforeInsertTransaction() {
     this.logo = this.logo || `logo.png`;
-    this.created = new Date();
-    this.lastupdated = new Date();
-    this.uid = generateUid();
     this.verified = false;
+    this.uid = generateUid();
+    this.created = new Date();
   }
 
   @BeforeUpdate()
-  beforeUpdating() {
+  beforeUpdateTransaction() {
     this.lastupdated = new Date();
   }
 }

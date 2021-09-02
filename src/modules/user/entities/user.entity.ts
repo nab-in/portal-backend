@@ -174,16 +174,15 @@ export class User extends NamedEntity {
     },
   })
   userRoles: UserRole[];
+
   @BeforeInsert()
-  async beforeUpdateTransaction() {
+  async beforeInsertTransaction() {
     this.dp = this.dp || 'dp.png';
     this.verified = false;
     this.enabled = true;
-    this.created = new Date();
-    this.lastupdated = new Date();
-    this.uid = generateUid();
     this.salt = await bcrypt.genSalt();
     this.password = await this.hashPassword(this.password, this.salt);
+    this.uid = generateUid();
   }
 
   @BeforeUpdate()
@@ -226,5 +225,9 @@ export class User extends NamedEntity {
   ): Promise<boolean> {
     const hash = await bcrypt.hash(password, salt);
     return hash === userpassword;
+  }
+  @BeforeUpdate()
+  beforeUpdateTransaction() {
+    this.lastupdated = new Date();
   }
 }

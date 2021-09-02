@@ -40,7 +40,7 @@ export class JobCategory extends NamedEntity {
   })
   subscribers: SubScriber[];
   @BeforeInsert()
-  beforeUpdateTransaction() {
+  beforeInsertTransaction() {
     this.created = new Date();
     this.lastupdated = new Date();
     this.uid = generateUid();

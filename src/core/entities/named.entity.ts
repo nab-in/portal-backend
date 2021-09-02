@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { generateUid } from '../helpers/makeuid.helper';
 import { PortalCoreEntity } from './portal.core.entity';
 
 export class NamedEntity extends PortalCoreEntity {
@@ -40,6 +41,7 @@ export class NamedEntity extends PortalCoreEntity {
   beforeInsertTransaction() {
     this.created = new Date();
     this.lastupdated = new Date();
+    this.uid = generateUid();
   }
 
   @BeforeUpdate()

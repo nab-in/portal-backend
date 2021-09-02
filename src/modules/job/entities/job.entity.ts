@@ -101,14 +101,11 @@ export class Job extends NamedEntity {
   categories: JobCategory[];
 
   @BeforeInsert()
-  beforeUpdateTransaction() {
-    this.created = new Date();
-    this.lastupdated = new Date();
+  beforeInsertTransaction() {
     this.uid = generateUid();
   }
-
   @BeforeUpdate()
-  beforeUpdating() {
+  beforeUpdateTransaction() {
     this.lastupdated = new Date();
   }
 }

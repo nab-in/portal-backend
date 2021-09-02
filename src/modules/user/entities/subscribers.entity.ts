@@ -1,5 +1,13 @@
+import { generateUid } from 'src/core/helpers/makeuid.helper';
 import { JobCategory } from 'src/modules/job/entities/job-category.entity';
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+} from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
 
 @Entity('subscribers', { schema: 'public' })
@@ -25,4 +33,14 @@ export class SubScriber extends NamedEntity {
     },
   })
   jobCategories: JobCategory[];
+
+  @BeforeInsert()
+  beforeInsertTransaction() {
+    this.created = new Date();
+    this.uid = generateUid();
+  }
+  @BeforeUpdate()
+  beforeUpdateTransaction() {
+    this.lastupdated = new Date();
+  }
 }
