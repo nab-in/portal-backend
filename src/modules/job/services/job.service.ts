@@ -34,22 +34,22 @@ export class JobService extends BaseService<Job> {
       if (query.startDate && query.endDate) {
         const date = new Date(query.startDate);
         date.setDate(date.getDate() - 1);
-        const startdate = date.toISOString().split('T')[0];
+        const startdate = date.toISOString();
         const dates = new Date(query.endDate);
         dates.setDate(dates.getDate() + 1);
-        const enddate = dates.toISOString().split('T')[0];
+        const enddate = dates.toISOString();
         sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE >= '${startdate}' AND A.DATE <='${enddate}') AS TBL OFFSET ${page} LIMIT ${size}`;
       }
       if (query.startDtae && !query.endDate) {
         const date = new Date(query.startDate);
         date.setDate(date.getDate() - 1);
-        const startdate = date.toISOString().split('T')[0];
+        const startdate = date.toISOString();
         sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE >= '${startdate}') AS TBL OFFSET ${page} LIMIT ${size}`;
       }
       if (query.endDtae && !query.startDate) {
         const dates = new Date(query.endDate);
         dates.setDate(dates.getDate() + 1);
-        const enddate = dates.toISOString().split('T')[0];
+        const enddate = dates.toISOString();
         sql = `SELECT *, COUNT(*) OVER() AS COUNT FROM (SELECT * FROM APPLIEDJOB A WHERE A.JOBID=${job.id} AND A.DATE <='${enddate}') AS TBL OFFSET ${page} LIMIT ${size}`;
       }
     }
@@ -110,6 +110,6 @@ export class JobService extends BaseService<Job> {
   async getUserJobs({ user, table, job }): Promise<any> {
     const sql = `SELECT * FROM ${table} A WHERE A.JOBID=${job.id} AND A.USERID=${user.id}`;
     const data = await this.repository.manager.query(sql);
-    return data
+    return data;
   }
 }

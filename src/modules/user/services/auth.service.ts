@@ -99,10 +99,10 @@ export class AuthService {
     } else {
       const date = new Date(query.startDate);
       date.setDate(date.getDate() - 1);
-      const startdate = date.toISOString().split('T')[0];
+      const startdate = date.toISOString()
       const dates = new Date(query.endDate);
       dates.setDate(dates.getDate() + 1);
-      const enddate = dates.toISOString().split('T')[0];
+      const enddate = dates.toISOString()
       const users = await this.userrepository.count({
         where: { created: Between(startdate, enddate) },
       });

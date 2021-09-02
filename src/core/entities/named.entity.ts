@@ -34,16 +34,16 @@ export class NamedEntity extends PortalCoreEntity {
     name: 'lastupdated',
     default: () => 'LOCALTIMESTAMP',
   })
-  lastUpdated: Date;
+  lastupdated: Date;
 
   @BeforeInsert()
   beforeInsertTransaction() {
     this.created = new Date();
-    this.lastUpdated = new Date();
+    this.lastupdated = new Date();
   }
 
   @BeforeUpdate()
   beforeUpdateTransaction() {
-    this.lastUpdated = this.lastUpdated || new Date();
+    this.lastupdated = this.lastupdated || new Date();
   }
 }
