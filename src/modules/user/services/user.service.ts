@@ -133,4 +133,9 @@ export class UserService extends BaseService<User> {
       message: `You have accepted the call for interview for job <${job.name}>`,
     };
   }
+  async getUserJobs({ user, table, job }): Promise<any> {
+    const sql = `SELECT * FROM ${table} A WHERE A.JOBID=${job.id} AND A.USERID=${user.id}`;
+    const data = await this.repository.manager.query(sql);
+    return data;
+  }
 }

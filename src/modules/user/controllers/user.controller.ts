@@ -155,9 +155,47 @@ export class UserController {
     const user = await this.service.findOneByUid(param.id);
     if (job) {
       if (user) {
-        job = { ...job, ...body };
-        const callForInterview = await this.service.interview({ job, user });
-        return res.status(HttpStatus.OK).send(callForInterview.message);
+        const userJob: {
+          jobid: number;
+          userid: number;
+          accepted: boolean;
+          interview: boolean | string;
+          date: string;
+          location: string;
+          created: Date;
+        } = await this.service.getUserJobs({
+          user,
+          job,
+          table: 'APPLIEDJOB',
+        });
+        if (
+          userJob &&
+          userJob.interview !== null &&
+          userJob.interview === false
+        ) {
+          return res
+            .status(HttpStatus.NOT_ACCEPTABLE)
+            .send(
+              `You can not call <${user.firstname} ${user.lastname}> for the interview job application has already been rejected`,
+            );
+        } else {
+          // console.log('DATE PARSED', Date.parse(userJob.date), userJob);
+          /*if (userJob && userJob.date && !isNaN(Date.parse(userJob.date))) {
+            console.log('USER JOBS', userJob);
+            return res
+              .status(HttpStatus.NOT_MODIFIED)
+              .send(
+                `You have already called ${user.firstname} ${user.lastname} for the interview`,
+              );
+          }*/
+
+          job = { ...job, ...body };
+          const callForInterview = await this.service.interview({
+            job,
+            user,
+          });
+          return res.status(HttpStatus.OK).send(callForInterview.message);
+        }
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
