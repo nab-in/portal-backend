@@ -518,7 +518,7 @@ export class UserController {
       });
     }
   }
-  @Put('id')
+  @Put(':id')
   @UseGuards(AuthGuard('jwt'))
   @UseFilters(new HttpErrorFilter())
   async update(
