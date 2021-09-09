@@ -111,7 +111,11 @@ export class UserService extends BaseService<User> {
     }
   }
   async interview({ job, user }): Promise<any> {
-    const query = `UPDATE APPLIEDJOB SET INTERVIEW=TRUE, DATE='${job.date}', LOCATION='${job.location}' WHERE USERID=${user.id} AND JOBID=${job.id}`;
+    const query = `UPDATE APPLIEDJOB SET INTERVIEW=TRUE, DATE='${new Date(
+      job.date,
+    ).toISOString()}', LOCATION='${job.location}' WHERE USERID=${
+      user.id
+    } AND JOBID=${job.id}`;
     await this.repository.manager.query(query);
     return {
       message: `<${user.firstname} ${user.lastname}> has been invited for the interview`,

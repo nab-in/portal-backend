@@ -24,7 +24,7 @@ import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,
   filesFilter,
-} from '../../../core/helpers/sanitize-image';
+} from '../../../core/helpers/sanitize-files';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import {

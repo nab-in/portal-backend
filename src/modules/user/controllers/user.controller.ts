@@ -26,7 +26,7 @@ import {
   editFileName,
   filesFilter,
   imageFileFilter,
-} from '../../../core/helpers/sanitize-image';
+} from '../../../core/helpers/sanitize-files';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';

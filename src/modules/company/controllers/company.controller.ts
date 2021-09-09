@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import { BaseController } from '../../../core/controllers/base.controller';
-import { editFileName, imageFileFilter } from 'src/core/helpers/sanitize-image';
+import { editFileName, imageFileFilter } from 'src/core/helpers/sanitize-files';
 import { HttpErrorFilter } from 'src/core/interceptors/error.filter';
 import { getConfiguration } from 'src/core/utilities/systemConfigs';
 import { User } from '../../user/entities/user.entity';
