@@ -81,46 +81,65 @@ export class AuthService {
     });
   }
   async getMertics(query: { startDate: Date; endDate: Date }): Promise<any> {
-    if (Object.keys(query).length === 0) {
-      const users = await this.userrepository.count();
-      const companies = await this.companyrepository.count();
-      const applications = Number(
-        (
-          await this.jobrepository.manager.query(
-            'SELECT COUNT(*) FROM APPLIEDJOB',
-          )
-        )[0]['count'],
-      );
-      const jobs = await this.jobrepository.count();
-      return {
-        message: 'Job Portal Admin Metrics',
-        metrics: { users, companies, applications, jobs },
-      };
-    } else {
-      const date = new Date(query.startDate);
-      date.setDate(date.getDate() - 1);
-      const startdate = date.toISOString()
-      const dates = new Date(query.endDate);
-      dates.setDate(dates.getDate() + 1);
-      const enddate = dates.toISOString()
-      const users = await this.userrepository.count({
-        where: { created: Between(startdate, enddate) },
-      });
-      const companies = await this.companyrepository.count({
-        where: { created: Between(startdate, enddate) },
-      });
-      const applications = Number(
-        (
-          await this.jobrepository.manager.query(
-            `SELECT COUNT(*) FROM APPLIEDJOB WHERE CREATED >= '${startdate}' AND CREATED <='${enddate}'`,
-          )
-        )[0]['count'],
-      );
-      const jobs = await this.jobrepository.count();
-      return {
-        message: `Job Portal Admin Metrics from ${query.startDate} to ${query.endDate}`,
-        metrics: { users, companies, applications, jobs },
-      };
-    }
+    const date = new Date(query.startDate || new Date());
+    date.setDate(query.startDate ? date.getDate() - 1 : date.getDate() - 31);
+    const startdate = date.toISOString();
+    const dates = new Date(query.endDate || new Date());
+    dates.setDate(dates.getDate() + 1);
+    const enddate = dates.toISOString();
+
+    const where = {
+      created: Between(startdate, enddate),
+    };
+
+    const users = await this.userrepository.count({
+      where,
+    });
+    const companies = await this.companyrepository.count({
+      where,
+    });
+    const applications = Number(
+      (
+        await this.jobrepository.manager.query(
+          `SELECT COUNT(*) FROM APPLIEDJOB WHERE CREATED >= '${startdate}' AND CREATED <='${enddate}'`,
+        )
+      )[0]['count'],
+    );
+    const jobs = await this.jobrepository.count({
+      where,
+    });
+    return {
+      message: 'Job Portal Admin Metrics',
+      metrics: {
+        users: [
+          {
+            startdate: query.startDate || startdate,
+            enddate: query.endDate || enddate,
+            value: users,
+          },
+        ],
+        companies: [
+          {
+            startdate: query.startDate || startdate,
+            enddate: query.endDate || enddate,
+            value: companies,
+          },
+        ],
+        applications: [
+          {
+            startdate: query.startDate || startdate,
+            enddate: query.endDate || enddate,
+            value: applications,
+          },
+        ],
+        jobs: [
+          {
+            startdate: query.startDate || startdate,
+            enddate: query.endDate || enddate,
+            value: jobs,
+          },
+        ],
+      },
+    };
   }
 }
