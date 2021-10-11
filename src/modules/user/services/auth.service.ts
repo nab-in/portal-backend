@@ -110,6 +110,8 @@ export class AuthService {
     });
     return {
       message: 'Job Portal Admin Metrics',
+      startDate: query.startDate || startdate,
+      endDate: query.endDate || enddate,
       metrics: {
         users: [
           {

@@ -35,6 +35,8 @@ export class CompanyService extends BaseService<Company> {
     interviews = await this.repository.manager.query(interviews);
     const metrics = {
       message: `Metrics for ${company.name}`,
+      startDate: query.startDate || startdate,
+      endDate: query.endDate || new Date().toISOString(),
       metrics: {
         applicants: [
           { value: Number(applicants[0]['count']), startdate, enddate },
