@@ -91,7 +91,7 @@ export class CompanyController extends BaseController<Company> {
     if (userCompany.length > 0 || admins.length > 0) {
       const company = await this.service.findOneByUid(param.id);
       if (company) {
-        const metrics = await this.service.companyMetrics({ company });
+        const metrics = await this.service.companyMetrics({ company, query });
         return res.status(HttpStatus.OK).send(metrics);
       } else {
         return res
