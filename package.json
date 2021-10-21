@@ -53,7 +53,7 @@
     "@types/compression": "1.7.1",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.0.2",
-    "@types/lodash": "4.14.172",
+    "@types/lodash": "4.14.176",
     "@types/multer": "1.4.7",
     "@types/node": "^16.4.13",
     "@types/nodemailer": "6.4.4",
