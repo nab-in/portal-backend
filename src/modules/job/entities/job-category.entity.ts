@@ -4,7 +4,6 @@ import {
   BeforeUpdate,
   Column,
   Entity,
-  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -34,7 +33,6 @@ export class JobCategory extends NamedEntity {
   children: JobCategory[];
 
   @ManyToMany(() => Job, (job) => job.categories, { nullable: true })
-  @JoinColumn({ name: 'jobcategoryId', referencedColumnName: 'id' })
   jobs: Job[];
 
   @ManyToMany(() => SubScriber, (subscribers) => subscribers.jobCategories, {

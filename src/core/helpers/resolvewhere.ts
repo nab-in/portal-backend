@@ -16,7 +16,5 @@ export async function resolveWhere(
     }
     checks.push(condition);
   }
-  if (checks.length === conditions.length) {
-    return checks;
-  }
+  return checks;
 }
