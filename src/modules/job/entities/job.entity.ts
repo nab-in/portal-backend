@@ -96,7 +96,7 @@ export class Job extends NamedEntity {
   @ManyToMany(() => JobCategory, (categories) => categories.jobs, {
     nullable: true,
   })
-  @JoinColumn({ name: 'jobid', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'jobId', referencedColumnName: 'id' })
   @JoinTable({ name: 'categoriesjob' })
   categories: JobCategory[];
 
