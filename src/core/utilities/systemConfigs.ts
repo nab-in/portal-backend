@@ -23,7 +23,44 @@ if (!fs.existsSync('./files/config.json')) {
     fs.readFileSync('./systemconfig.example.json'),
   );
 }
-const config = JSON.parse(fs.readFileSync('./files/config.json', 'utf8'));
+const config = {
+  database: {
+    type: process.env.DB_TYPE,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    synchronize: true,
+    logging: false,
+    dropSchema: false,
+    entities: ['dist/modules/**/entities/*.entity.js'],
+    migrations: ['dist/database/migrations/**/*.js'],
+    subscribers: ['src/subscriber/**/*.ts'],
+    migrationsRun: true,
+    cli: {
+      entitiesDir: 'src/modules/entities',
+      migrationsDir: 'src/database/migrations',
+      subscribersDir: 'src/subscriber',
+    },
+  },
+  email: {
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+    smtp: process.env.SMTP,
+    adminpassword: process.env.ADMIN_PASSWORD,
+    adminemail: process.env.ADMIN_EMAIL,
+  },
+  serverport: process.env.SERVERPORT,
+  cv: './files/profile/user/cv',
+  dp: './files/profile/user/dp',
+  user: './files/profile/user',
+  job: './files/profile/job',
+  company: './files/profile/company',
+  serverurl: process.env.SERVER_URL,
+};
 
 export function getDataBaseConfiguration() {
   return {
@@ -32,9 +69,9 @@ export function getDataBaseConfiguration() {
 }
 
 export function getConfiguration() {
-  const files = config.files || {};
-  if (!config.port) {
-    config.port = config.serverport;
+  const files = config['files'] || {};
+  if (!config['port']) {
+    config['port'] = config.serverport;
   }
   if (!config.serverurl) {
     config.serverurl = config.serverurl;
