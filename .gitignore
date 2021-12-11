@@ -44,3 +44,6 @@ files
 
 # evnironmental variables
 .portal.env
+
+# DB startup file
+init.sql

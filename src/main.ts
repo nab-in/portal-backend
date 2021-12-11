@@ -17,7 +17,7 @@ async function bootstrap() {
   app.use(express.json({ limit: '50mb' }));
 
   app.enableCors();
-  const { httpAdapter } = app.get(HttpAdapterHost);
+  // const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new HttpErrorFilter());
 
   app.useGlobalInterceptors(new LoggingInterceptor());
@@ -32,7 +32,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);*/
 
-  await app.listen(await getConfiguration().port);
-  Logger.log('App listening on Port ', await app.getUrl());
+  await app.listen((await getConfiguration().port) || 3000);
+  Logger.log(
+    `App listening on Port: ${(await getConfiguration().port) || 3000} `,
+    await app.getUrl(),
+  );
 }
 bootstrap();

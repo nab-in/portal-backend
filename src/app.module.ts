@@ -16,6 +16,7 @@ import { modules } from './modules/modules.export';
       ...getDataBaseConfiguration,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       type: 'postgres',
+      migrationsRun: true,
     }),
   ],
   controllers: [AppController],
