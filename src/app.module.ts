@@ -8,8 +8,14 @@ import { getDataBaseConfiguration } from './core/utilities/systemConfigs';
 import { modules } from './modules/modules.export';
 
 @Module({
-  // imported modules definition
-  imports: [...modules, TypeOrmModule.forRoot(getDataBaseConfiguration())],
+  imports: [
+    ...modules,
+    TypeOrmModule.forRoot({
+      ...getDataBaseConfiguration,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      type: 'postgres',
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],
 })
