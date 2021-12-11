@@ -1,33 +1,14 @@
 import * as fs from 'fs';
 let pathFolder = process.env.PORTAL;
-if (!pathFolder) {
-  if (!fs.existsSync('./files')) {
-    fs.mkdirSync('./files');
-    fs.mkdirSync('./files/profile');
-  }
-  if (!fs.existsSync('./files/config.json')) {
-    fs.writeFileSync(
-      './files/config.json',
-      fs.readFileSync('./systemconfig.example.json'),
-    );
-  }
-  pathFolder = __dirname.split('./files').join('');
-}
 if (!fs.existsSync('./files')) {
   fs.mkdirSync('./files');
   fs.mkdirSync('./files/profile');
 }
-if (!fs.existsSync('./files/config.json')) {
-  fs.writeFileSync(
-    './files/config.json',
-    fs.readFileSync('./systemconfig.example.json'),
-  );
-}
+
 const config = {
   database: {
-    type: process.env.DB_TYPE,
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: Number(process.env.DB_PORT),
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -38,11 +19,6 @@ const config = {
     migrations: ['dist/database/migrations/**/*.js'],
     subscribers: ['src/subscriber/**/*.ts'],
     migrationsRun: true,
-    cli: {
-      entitiesDir: 'src/modules/entities',
-      migrationsDir: 'src/database/migrations',
-      subscribersDir: 'src/subscriber',
-    },
   },
   email: {
     auth: {
@@ -53,20 +29,19 @@ const config = {
     adminpassword: process.env.ADMIN_PASSWORD,
     adminemail: process.env.ADMIN_EMAIL,
   },
-  serverport: process.env.SERVERPORT,
-  cv: './files/profile/user/cv',
-  dp: './files/profile/user/dp',
-  user: './files/profile/user',
-  job: './files/profile/job',
-  company: './files/profile/company',
+  serverport: Number(process.env.SERVERPORT),
+  cv: process.env.FILES_CV,
+  dp: process.env.FILES_DP,
+  user: process.env.FILES_USER,
+  job: process.env.FILES_JOB,
+  company: process.env.FILES_COMPANY,
   serverurl: process.env.SERVER_URL,
 };
 
-export function getDataBaseConfiguration() {
-  return {
-    ...config.database,
-  };
-}
+export const getDataBaseConfiguration = {
+  ...config.database,
+  migrations: ['../../../database/migration/*.ts'],
+};
 
 export function getConfiguration() {
   const files = config['files'] || {};
