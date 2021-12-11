@@ -43,4 +43,4 @@ docker-compose.yml
 files
 
 # evnironmental variables
-.env
+.portal.env
