@@ -26,6 +26,7 @@ const config = {
       pass: process.env.EMAIL_PASSWORD,
     },
     smtp: process.env.SMTP,
+    port: Number(process.env.SMTP_PORT),
     adminpassword: process.env.ADMIN_PASSWORD,
     adminemail: process.env.ADMIN_EMAIL,
   },
@@ -77,6 +78,9 @@ export function getConfiguration() {
   }
   if (!fs.existsSync(config.cv)) {
     fs.mkdirSync(config.cv);
+  }
+  if (!fs.existsSync(config.company)) {
+    fs.mkdirSync(config.company);
   }
   if (!files.cv) {
     files.cv = config.cv;
