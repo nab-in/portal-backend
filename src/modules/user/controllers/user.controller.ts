@@ -175,9 +175,9 @@ export class UserController {
         ) {
           return res
             .status(HttpStatus.NOT_ACCEPTABLE)
-            .send(
-              `You can not call <${user.firstname} ${user.lastname}> for the interview job application has already been rejected`,
-            );
+            .send({
+              error: `You can not call <${user.firstname} ${user.lastname}> for the interview job application has already been rejected`,
+            });
         } else {
           // console.log('DATE PARSED', Date.parse(userJob.date), userJob);
           /*if (userJob && userJob.date && !isNaN(Date.parse(userJob.date))) {
@@ -199,12 +199,12 @@ export class UserController {
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
-          .send(`User with ID ${param.id} could not be found`);
+          .send({ error: `User with ID ${param.id} could not be found` });
       }
     } else {
       return res
         .status(HttpStatus.NOT_FOUND)
-        .send(`Job with ID ${body.job} could not be found`);
+        .send({ error: `Job with ID ${body.job} could not be found` });
     }
   }
 
@@ -229,7 +229,7 @@ export class UserController {
     } else {
       return res
         .status(HttpStatus.NOT_FOUND)
-        .send(`Job with ID ${body.job} could not be found`);
+        .send({ error: `Job with ID ${body.job} could not be found` });
     }
   }
 
@@ -252,12 +252,12 @@ export class UserController {
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
-          .send(`User with ID ${param.id} could not be found`);
+          .send({ error: `User with ID ${param.id} could not be found` });
       }
     } else {
       return res
         .status(HttpStatus.NOT_FOUND)
-        .send(`Job with ID ${body.job} could not be found`);
+        .send({ error: `Job with ID ${body.job} could not be found` });
     }
   }
 
@@ -428,7 +428,7 @@ export class UserController {
     } else {
       return res
         .status(HttpStatus.FORBIDDEN)
-        .send('You have limited access to this resource');
+        .send({ error: 'You have limited access to this resource' });
     }
   }
   @Get('belongstocompany')
@@ -534,12 +534,14 @@ export class UserController {
             payload: resolveResponse(data),
           });
         } else {
-          return res.status(HttpStatus.FORBIDDEN).send('Incorrect password');
+          return res
+            .status(HttpStatus.FORBIDDEN)
+            .send({ error: 'Incorrect password' });
         }
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
-          .send('User with such token is unavailable');
+          .send({ error: 'User with such token is unavailable' });
       }
     } else {
       const updateEntity = await this.service.findOneByUid(req.user.id);
@@ -595,12 +597,12 @@ export class UserController {
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
-          .send('User with such token is unavailable');
+          .send({ error: 'User with such token is unavailable' });
       }
     } else {
       return res
         .status(HttpStatus.FORBIDDEN)
-        .send('You have no permission to perform this action');
+        .send({ error: 'You have no permission to perform this action' });
     }
   }
   @Get(':imgpath/dp')
@@ -629,14 +631,12 @@ export class UserController {
             } else {
               user.verified = true;
               await this.service.update(user);
-              return res
-                .status(HttpStatus.OK)
-                .send(
-                  `Hello <${user.firstname}> You have successfully verified your account. Enjoy Job Portal`,
-                );
+              return res.status(HttpStatus.OK).send({
+                message: `Hello <${user.firstname}> You have successfully verified your account. Enjoy Job Portal`,
+              });
             }
           } else {
-            return res.status(HttpStatus.OK).send('Invalid token');
+            return res.status(HttpStatus.OK).send({ message: 'Invalid token' });
           }
         } else {
           return res.redirect(config.serverurl);
@@ -644,7 +644,9 @@ export class UserController {
       } else {
       }
     } else {
-      return res.status(HttpStatus.BAD_REQUEST).send('Link is invalid');
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ error: 'Link is invalid' });
     }
   }
 }
