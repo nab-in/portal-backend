@@ -129,7 +129,6 @@ export class BaseService<T extends PortalCoreEntity> {
       const token = jwt.sign({ id }, secretKey, {
         expiresIn: 604800,
       });
-      console.log(JSON.stringify(token));
       const url =
         config.serverurl + `/api/users/verify?token=${token}&id=${id}`;
       const message = {
