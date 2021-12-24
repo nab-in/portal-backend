@@ -117,8 +117,8 @@ export class BaseService<T extends PortalCoreEntity> {
       const config: systemConfig = getConfiguration();
       const auth = config.email.auth;
       const transport = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
         secure: true,
         requireTLS: true,
         auth,
