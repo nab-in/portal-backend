@@ -1,8 +1,18 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { Job } from 'src/modules/job/entities/job.entity';
-import { User } from 'src/modules/user/entities/user.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { Job } from '../../job/entities/job.entity';
+import { User } from '../../user/entities/user.entity';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { NamedEntity } from '../../../core/entities/named.entity';
+
 @Entity('company', { schema: 'public' })
 export class Company extends NamedEntity {
   static plural = 'companies';
@@ -23,6 +33,7 @@ export class Company extends NamedEntity {
   @Column('varchar', {
     nullable: false,
     name: 'website',
+    unique: true,
   })
   website: string;
 
@@ -35,28 +46,55 @@ export class Company extends NamedEntity {
   @Column('varchar', {
     nullable: true,
     name: 'about',
+    unique: true,
   })
   about: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'verified',
+  })
+  verified: boolean;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'bio',
+  })
+  bio: string;
+
+  @Column('varchar', {
+    nullable: true,
+    name: 'websitelink',
+  })
+  websitelink: string;
 
   @OneToMany(() => Job, (job) => job.company, {
     cascade: true,
   })
   jobs: Job[];
 
-  @OneToMany(() => User, (users) => users.company, {
-    cascade: true,
-  })
+  @ManyToMany(() => User, (users) => users.companies, { nullable: true })
+  @JoinColumn({ name: 'usercompanies', referencedColumnName: 'id' })
   users: User[];
 
+  @ManyToOne(() => User, (user) => user.createdCompanies, { nullable: false })
+  @JoinColumn({ name: 'createdby' })
+  createdBy: User;
+
+  @ManyToOne(() => User, (user) => user.updatedCompanies, { nullable: false })
+  @JoinColumn({ name: 'lastupdatedby' })
+  lastUpdatedBy: User;
+
   @BeforeInsert()
-  beforeUpdateTransaction() {
-    this.created = new Date();
-    this.lastupdated = new Date();
+  beforeInsertTransaction() {
+    this.logo = this.logo || `logo.png`;
+    this.verified = false;
     this.uid = generateUid();
+    this.created = new Date();
   }
 
   @BeforeUpdate()
-  beforeUpdating() {
+  beforeUpdateTransaction() {
     this.lastupdated = new Date();
   }
 }

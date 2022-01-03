@@ -1,36 +1,25 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HttpErrorFilter } from './core/interceptors/error.filter';
+import { getDataBaseConfiguration } from './core/utilities/systemConfigs';
 import { modules } from './modules/modules.export';
 
 @Module({
-  // imported modules definition
   imports: [
+    ConfigModule.forRoot(),
     ...modules,
     TypeOrmModule.forRoot({
-      name: 'default',
+      ...getDataBaseConfiguration,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       type: 'postgres',
-      host: 'ec2-18-215-111-67.compute-1.amazonaws.com',
-      port: 5432,
-      username: 'dfckkdjtmnzblu',
-      password:
-        'e0917d22f2db1c884f949f328f5d6404ddfba8f4f7323fde6878b06066aa106e',
-      database: 'd5nek5j478bf4',
-      synchronize: true,
-      logging: false,
-      dropSchema: true,
-      entities: ['dist/modules/**/entities/*.entity.js'],
-      migrations: ['dist/database/migrations/**/*.js'],
-      subscribers: ['src/subscriber/**/*.ts'],
-      cli: {
-        entitiesDir: 'src/modules/entities',
-        migrationsDir: 'src/database/migrations',
-        subscribersDir: 'src/subscriber',
-      },
+      migrationsRun: true,
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],
 })
 export class AppModule {}

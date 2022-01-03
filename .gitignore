@@ -35,3 +35,15 @@ lerna-debug.log*
 
 #config files
 ormconfig.json
+
+#dockerfiles
+docker-compose.yml
+
+#ignore image files
+files
+
+# evnironmental variables
+.portal.env
+
+# DB startup file
+init.sql

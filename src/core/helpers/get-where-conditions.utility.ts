@@ -1,14 +1,13 @@
-import * as _ from 'lodash';
-import { In, Like, ILike } from 'typeorm';
+import { In, Like, ILike, Not } from 'typeorm';
 export function getWhereConditions(filter: any): any[] {
   if (!filter) {
     return [];
   }
 
-  const filterParams = _.isString(filter) ? [filter] : filter;
+  const filterParams = typeof filter === 'string' ? [filter] : filter;
 
-  return _.filter(
-    _.map(filterParams || [], (filterParam) => {
+  return filterParams
+    .map((filterParam: any) => {
       const filterSplit = (filterParam || '').split(':');
       const filterOperation = filterSplit[1];
 
@@ -26,7 +25,7 @@ export function getWhereConditions(filter: any): any[] {
                 filterSplit[2]
                   .slice(1, -1)
                   .split(',')
-                  .map((filters) => filters),
+                  .map((filters: any) => filters),
               ),
             };
           }
@@ -46,10 +45,15 @@ export function getWhereConditions(filter: any): any[] {
           }
           return { [filterSplit[0]]: ILike(`%${filterSplit[2]}%`) };
         }
+        case '!in': {
+          if (filterSplit[0] == 'id') {
+            return { uid: Not(`${filterSplit[2]}`) };
+          }
+          return { [filterSplit[0]]: Not(filterSplit[2]) };
+        }
         default:
           return null;
       }
-    }),
-    (condition) => condition,
-  );
+    })
+    .filter((condition: any) => condition);
 }

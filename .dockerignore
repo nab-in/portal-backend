@@ -1,0 +1,8 @@
+# evnironmental variables
+.portal.env
+
+# DB startup sql
+init.sql
+
+# Ignore DB Migrations
+src/database

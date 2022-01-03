@@ -3,4 +3,8 @@ export const entityDatabaseMapping = {
   user: 'user',
   company: 'company',
   companies: 'company',
+  jobs: 'job',
+  parent: 'jobcategory',
+  categories: 'jobcategory',
+  userRoles: 'userrole',
 };

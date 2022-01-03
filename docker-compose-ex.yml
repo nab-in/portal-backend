@@ -1,0 +1,40 @@
+version: '3.2'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    container_name: portal-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+    volumes:
+      - postdb-data:/var/lib/postgresql/data
+  nginx:
+    image: nginx:1.17.9-alpine
+    container_name: portal-nginx
+    ports:
+      - 5000:8080
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+  api:
+    image: portal/api
+    container_name: portal-api
+    build: .
+    environment:
+      - PORTAL=/home/app/files
+    restart: always
+    depends_on:
+      - db
+    # command: node --max_old_space_size=15500 dist/src/main.js
+    command: npm run start:dev
+    volumes:
+      - ./src:/home/app/src
+      - ./files:/home/app/files
+      - ./dist:/home/app/dist
+volumes:
+  postdb-data:
+    driver: local

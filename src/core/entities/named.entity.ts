@@ -1,4 +1,12 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeUpdate,
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { generateUid } from '../helpers/makeuid.helper';
 import { PortalCoreEntity } from './portal.core.entity';
 
 export class NamedEntity extends PortalCoreEntity {
@@ -9,6 +17,7 @@ export class NamedEntity extends PortalCoreEntity {
     nullable: false,
     length: 13,
     name: 'uid',
+    unique: true,
   })
   uid: string;
 
@@ -18,16 +27,25 @@ export class NamedEntity extends PortalCoreEntity {
   })
   name: string;
 
-  @Column('timestamp without time zone', {
-    nullable: true,
-    name: 'created',
-  })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'LOCALTIMESTAMP' })
   created: Date;
 
-  @Column('timestamp without time zone', {
-    nullable: true,
-    default: () => 'NULL::timestamp without time zone',
+  @UpdateDateColumn({
+    type: 'timestamp',
     name: 'lastupdated',
+    default: () => 'LOCALTIMESTAMP',
   })
-  lastupdated: Date | null;
+  lastupdated: Date;
+
+  @BeforeInsert()
+  beforeInsertTransaction() {
+    this.created = new Date();
+    this.lastupdated = new Date();
+    this.uid = generateUid();
+  }
+
+  @BeforeUpdate()
+  beforeUpdateTransaction() {
+    this.lastupdated = this.lastupdated || new Date();
+  }
 }
