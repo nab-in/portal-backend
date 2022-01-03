@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { BaseController } from '../../../core/controllers/base.controller';
+import { BaseController } from 'src/core/controllers/base.controller';
 import { UserRole } from '../entities/userrole.entity';
 import { UserRoleService } from '../services/userrole.service';
 
