@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -206,6 +206,26 @@ export class UserService extends BaseService<User> {
       return { message: `Password Reset email has been sent to ${user.email}` };
     } catch (e) {
       return e.message;
+    }
+  }
+  async updatePassword(user: User, body: { token: string; password: any }) {
+    try {
+      const secretKey = `${user.password} - ${user.created}`;
+      const decoded = jwt.verify(body.token, secretKey);
+      if (decoded['userId'] === user.uid) {
+        user.password = body.password;
+        user.enabled = true;
+        await this.repository.save(user);
+        return {
+          message: `Your Password has been reset successfully`,
+          user: user,
+        };
+      }
+    } catch (e) {
+      console.log(e.message);
+      throw new BadRequestException(
+        `We are unable to verify your identity, the link might have either expired or used twice. Please, use the the forgot password options on login page to get a fresh link`,
+      );
     }
   }
 }

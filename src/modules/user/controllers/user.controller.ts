@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -671,6 +672,22 @@ export class UserController {
       }
     } catch (e) {
       throw new Error(e.message);
+    }
+  }
+  @Put('passwordreset')
+  async resetUserPassword(@Body() body: any, @Res() res: any) {
+    const user = await this.service.findOneByUid(body.userid);
+    if (user) {
+      try {
+        const updatedUser = await this.service.updatePassword(user, body);
+        return res.status(HttpStatus.OK).send(resolveResponse(updatedUser));
+      } catch (e) {
+        throw new BadRequestException(
+          `We are unable to verify your identity, the link might have either expired or used twice. Please, use the the forgot password options on login page to get a fresh link`,
+        );
+      }
+    } else {
+      throw new BadRequestException(`Internal Server Error`);
     }
   }
 }
