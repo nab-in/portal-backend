@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import e from 'express';
-import { getSuccessResponse } from 'src/core/utilities/response.helper';
+import { getSuccessResponse } from '../../../core/utilities/response.helper';
 import { HttpErrorFilter } from '../../../core/interceptors/error.filter';
 import { resolveResponse } from '../../../core/resolvers/response.sanitizer';
 import { User } from '../entities/user.entity';
@@ -36,6 +36,23 @@ export class AuthController {
         .send({ message: 'Username or Password provided is incorrect.' });
     }
   }
+
+  @Post('login')
+  @UseFilters(new HttpErrorFilter())
+  async passwordreset(@Res() res: any, @Body() loginDTO): Promise<any> {
+    const user = await this.authService.login(
+      loginDTO.username || loginDTO.email,
+      loginDTO.password,
+    );
+    if (user && !user.status) {
+      return getSuccessResponse(res, resolveResponse(user));
+    } else {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .send({ message: 'Username or Password provided is incorrect.' });
+    }
+  }
+
   @Get('logout')
   @UseFilters(new HttpErrorFilter())
   @UseGuards(AuthGuard('jwt'))
@@ -82,6 +99,6 @@ export class AuthController {
   @UseFilters(new HttpErrorFilter())
   async subscribe(
     @Res() res: any,
-    @Body() bod: { name: string; email: string },
+    @Body() body: { name: string; email: string },
   ): Promise<any> {}
 }

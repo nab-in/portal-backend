@@ -1,5 +1,5 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { JobCategory } from 'src/modules/job/entities/job-category.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { JobCategory } from '../../job/entities/job-category.entity';
 import {
   BeforeInsert,
   BeforeUpdate,

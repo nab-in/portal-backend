@@ -12,7 +12,7 @@ import { JobService } from './services/job.service';
   imports: [
     TypeOrmModule.forFeature([Job, JobCategory, User]),
     MulterModule.register({
-      dest: 'src/files',
+      dest: './files',
     }),
   ],
   controllers: [JobController, JobCategoryController],

@@ -1,4 +1,4 @@
-import { SubScriber } from 'src/modules/user/entities/subscribers.entity';
+import { SubScriber } from '../../user/entities/subscribers.entity';
 import {
   BeforeInsert,
   BeforeUpdate,

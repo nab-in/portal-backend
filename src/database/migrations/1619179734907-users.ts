@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { getConfiguration } from '../../core/utilities/systemConfigs';
-import { systemConfig } from 'src/core/interfaces/system-config';
+import { systemConfig } from '../../core/interfaces/system-config';
 
 export class users1619179734907 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

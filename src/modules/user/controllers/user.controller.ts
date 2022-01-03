@@ -21,7 +21,7 @@ import { query } from 'express';
 import * as fs from 'fs';
 import * as jwt from 'jsonwebtoken';
 import { diskStorage } from 'multer';
-import { systemConfig } from 'src/core/interfaces/system-config';
+import { systemConfig } from '../../../core/interfaces/system-config';
 import {
   editFileName,
   filesFilter,
@@ -173,11 +173,9 @@ export class UserController {
           userJob.interview !== null &&
           userJob.interview === false
         ) {
-          return res
-            .status(HttpStatus.NOT_ACCEPTABLE)
-            .send({
-              error: `You can not call <${user.firstname} ${user.lastname}> for the interview job application has already been rejected`,
-            });
+          return res.status(HttpStatus.NOT_ACCEPTABLE).send({
+            error: `You can not call <${user.firstname} ${user.lastname}> for the interview job application has already been rejected`,
+          });
         } else {
           // console.log('DATE PARSED', Date.parse(userJob.date), userJob);
           /*if (userJob && userJob.date && !isNaN(Date.parse(userJob.date))) {
@@ -647,6 +645,32 @@ export class UserController {
       return res
         .status(HttpStatus.BAD_REQUEST)
         .send({ error: 'Link is invalid' });
+    }
+  }
+  @Post('passwordreset')
+  async passwordreset(
+    @Body() payload: any,
+    @Res() res: any,
+    @Req() req,
+  ): Promise<any> {
+    const user: User = await this.service.findUser(payload);
+    try {
+      if (user) {
+        if (user.email) {
+          const emailsent = await this.service.sendmail(user);
+          return res.status(HttpStatus.OK).send(emailsent);
+        } else {
+          throw new NotFoundException(
+            `There is no email associated with your Username`,
+          );
+        }
+      } else {
+        throw new NotFoundException(
+          `There is no account associated with ${payload.user}`,
+        );
+      }
+    } catch (e) {
+      throw new Error(e.message);
     }
   }
 }

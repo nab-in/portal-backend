@@ -1,4 +1,4 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
+import { generateUid } from ../../..core/helpers/makeuid.helper';
 import {
   BeforeInsert,
   BeforeUpdate,

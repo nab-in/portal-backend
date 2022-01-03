@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Job } from '../../job/entities/job.entity';
-import { Between, In, Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
 import jwt_decode from 'jwt-decode';
+import { Between, Repository } from 'typeorm';
 import {
   getRelations,
   getSelections,
 } from '../../../core/helpers/get-fields.utility';
-import { Company } from 'src/modules/company/entities/company.entity';
+import { Company } from '../../company/entities/company.entity';
+import { Job } from '../../job/entities/job.entity';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {

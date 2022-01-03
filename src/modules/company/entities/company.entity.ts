@@ -1,6 +1,6 @@
-import { generateUid } from 'src/core/helpers/makeuid.helper';
-import { Job } from 'src/modules/job/entities/job.entity';
-import { User } from 'src/modules/user/entities/user.entity';
+import { generateUid } from '../../../core/helpers/makeuid.helper';
+import { Job } from '../../job/entities/job.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   BeforeInsert,
   BeforeUpdate,

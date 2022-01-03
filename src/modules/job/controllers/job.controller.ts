@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { diskStorage } from 'multer';
-import { getPagerDetails } from 'src/core/utilities/get-pager-details.utility';
+import { getPagerDetails } from '../../../core/utilities/get-pager-details.utility';
 import { BaseController } from '../../../core/controllers/base.controller';
 import {
   editFileName,

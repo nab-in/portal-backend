@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseService } from 'src/core/services/base.service';
-import { Job } from '../../job/entities/job.entity';
-import { Company } from '../../company/entities/company.entity';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import { passwordReset } from '../../../core/helpers/templates/password.reset.template';
+import { BaseService } from '../../../core/services/base.service';
 import { In, Repository } from 'typeorm';
+import { Company } from '../../company/entities/company.entity';
+import { Job } from '../../job/entities/job.entity';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -141,5 +144,68 @@ export class UserService extends BaseService<User> {
     const sql = `SELECT * FROM ${table} A WHERE A.JOBID=${job.id} AND A.USERID=${user.id}`;
     const data = await this.repository.manager.query(sql);
     return data;
+  }
+
+  async findUser(payload: { user?: any }): Promise<any> {
+    try {
+      const email: RegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+      const isEmail = email.test(payload.user);
+      if (isEmail) {
+        const user = await this.repository.findOne({
+          where: { email: payload.user },
+        });
+        return user;
+      } else {
+        const user = await this.repository.findOne({
+          where: { username: payload.user },
+        });
+        return user;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  }
+  async sendmail(user: User): Promise<any> {
+    const config = {
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    };
+    try {
+      const secretKey = `${user.password} - ${user.created}`;
+      const userId = user.uid;
+      const token = jwt.sign({ userId }, secretKey, {
+        expiresIn: 3600,
+      });
+      const url = `${process.env.SERVER_URL}/users?userid=${user.uid}&token=${token}`;
+      const transport = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: 465,
+        secure: true,
+        requireTLS: true,
+        auth: config.auth,
+      });
+      const message = {
+        from: `${process.env.PORTAL_NAME || 'Job Portal'} Password Recovery <${
+          config.auth.user
+        }>`,
+        to: `"${user.firstname}" <${user.email}>`,
+        subject: 'Password Reset Email',
+        text: `Hello ${user.firstname}.`,
+        html: `${passwordReset(user, url)}`,
+      };
+
+      transport.sendMail(message, function (error) {
+        if (error) {
+          return error.message;
+        } else {
+          return true;
+        }
+      });
+      return { message: `Password Reset email has been sent to ${user.email}` };
+    } catch (e) {
+      return e.message;
+    }
   }
 }
