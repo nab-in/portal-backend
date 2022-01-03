@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
+import * as jwt from 'jsonwebtoken';
+import * as nodemailer from 'nodemailer';
+import * as bcrypt from 'bcrypt'
 import { passwordReset } from '../../../core/helpers/templates/password.reset.template';
 import { BaseService } from '../../../core/services/base.service';
 import { In, Repository } from 'typeorm';
@@ -179,9 +180,10 @@ export class UserService extends BaseService<User> {
         expiresIn: 3600,
       });
       const url = `${process.env.SERVER_URL}/users?userid=${user.uid}&token=${token}`;
+      console.log(url)
       const transport = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
-        port: 465,
+        port: Number(process.env.SMTP_PORT),
         secure: true,
         requireTLS: true,
         auth: config.auth,
@@ -198,6 +200,7 @@ export class UserService extends BaseService<User> {
 
       transport.sendMail(message, function (error) {
         if (error) {
+          console.log(error)
           return error.message;
         } else {
           return true;
@@ -205,7 +208,7 @@ export class UserService extends BaseService<User> {
       });
       return { message: `Password Reset email has been sent to ${user.email}` };
     } catch (e) {
-      return e.message;
+      throw new Error(e.message);
     }
   }
   async updatePassword(user: User, body: { token: string; password: any }) {
@@ -213,7 +216,8 @@ export class UserService extends BaseService<User> {
       const secretKey = `${user.password} - ${user.created}`;
       const decoded = jwt.verify(body.token, secretKey);
       if (decoded['userId'] === user.uid) {
-        user.password = body.password;
+        user.salt = await bcrypt.genSaltSync()
+        user.password  = await bcrypt.hash(body.password, user.salt);
         user.enabled = true;
         await this.repository.save(user);
         return {

@@ -41,7 +41,7 @@ const config = {
 
 export const getDataBaseConfiguration = {
   ...config.database,
-  migrations: ['../../../database/migration/*.ts'],
+  migrations: ['src/database/migration/*.ts'],
 };
 
 export function getConfiguration() {
