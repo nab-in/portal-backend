@@ -649,7 +649,7 @@ export class UserController {
     }
   }
   @Post('passwordreset')
-  async passwordreset(
+  async sendPasswordResetEmail(
     @Body() payload: any,
     @Res() res: any,
     @Req() req,
@@ -671,12 +671,13 @@ export class UserController {
         );
       }
     } catch (e) {
+      console.log(e.message)
       throw new Error(e.message);
     }
   }
-  @Put('passwordreset')
-  async resetUserPassword(@Body() body: any, @Res() res: any) {
-    const user = await this.service.findOneByUid(body.userid);
+  @Post(':id/passwordreset')
+  async verifyUserPasswordRestInfo(@Body() body: any, @Res() res: any, @Param() param : {id: string}) {
+    const user = await this.service.findOneByUid(param.id);
     if (user) {
       try {
         const updatedUser = await this.service.updatePassword(user, body);
