@@ -1,8 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
 import * as nodemailer from 'nodemailer';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 import { passwordReset } from '../../../core/helpers/templates/password.reset.template';
 import { BaseService } from '../../../core/services/base.service';
 import { In, Repository } from 'typeorm';
@@ -180,7 +184,6 @@ export class UserService extends BaseService<User> {
         expiresIn: 3600,
       });
       const url = `${process.env.SERVER_URL}/users?userid=${user.uid}&token=${token}`;
-      console.log(url)
       const transport = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
@@ -200,7 +203,7 @@ export class UserService extends BaseService<User> {
 
       transport.sendMail(message, function (error) {
         if (error) {
-          console.log(error)
+          console.log(error);
           return error.message;
         } else {
           return true;
@@ -216,8 +219,8 @@ export class UserService extends BaseService<User> {
       const secretKey = `${user.password} - ${user.created}`;
       const decoded = jwt.verify(body.token, secretKey);
       if (decoded['userId'] === user.uid) {
-        user.salt = await bcrypt.genSaltSync()
-        user.password  = await bcrypt.hash(body.password, user.salt);
+        user.salt = await bcrypt.genSaltSync();
+        user.password = await bcrypt.hash(body.password, user.salt);
         user.enabled = true;
         await this.repository.save(user);
         return {
