@@ -2,7 +2,7 @@ name: Portal Docker Image
 
 on:
   pull_request:
-    branches: [main]
+    branches: [release]
 
 jobs:
   build:
