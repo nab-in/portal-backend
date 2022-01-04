@@ -7,6 +7,7 @@ import { getRelations, getSelections } from '../helpers/get-fields.utility';
 import { getWhereConditions } from '../helpers/get-where-conditions.utility';
 import { resolvedResponse } from '../helpers/resolve.payload';
 import { resolveWhere } from '../helpers/resolvewhere';
+import { emailVerification } from '../helpers/templates/email.verification';
 import { newaccount } from '../helpers/templates/new-account';
 import { systemConfig } from '../interfaces/system-config';
 import { getConfiguration } from '../utilities/systemConfigs';
@@ -136,7 +137,7 @@ export class BaseService<T extends PortalCoreEntity> {
         to: `"${savedEntity['firstname']}" <${savedEntity['email']}>`,
         subject: 'New Job Portal Account',
         text: `Hello ${savedEntity['firstname']}.`,
-        html: `${newaccount(savedEntity, url)}`,
+        html: `${emailVerification(savedEntity, url)}`,
       };
       transport.sendMail(message, function (error) {
         if (error) {
