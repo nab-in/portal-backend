@@ -6,7 +6,7 @@ import {
   getSelections,
 } from '../../../core/helpers/get-fields.utility';
 import { getWhereConditions } from '../../../core/helpers/get-where-conditions.utility';
-import { resolveWhere } from '../../../core/helpers/resolvewhere';
+import { resolveWhereJob } from '../../../core/helpers/resolvewhere';
 import { BaseService } from '../../../core/services/base.service';
 import { User } from '../../user/entities/user.entity';
 import { Job } from '../entities/job.entity';
@@ -130,11 +130,11 @@ export class JobService extends BaseService<Job> {
     let where = Object.assign(
       {},
       ...((
-        await resolveWhere(this.modelRepository, getWhereConditions(filter))
+        await resolveWhereJob(this.modelRepository, getWhereConditions(filter))
       )['checks'] || []),
     );
     const categories: any[] = (
-      await resolveWhere(this.modelRepository, getWhereConditions(filter))
+      await resolveWhereJob(this.modelRepository, getWhereConditions(filter))
     )['categories'];
     if (categories && categories.length > 0) {
       const ids: any[] = await this.modelRepository.manager.query(
