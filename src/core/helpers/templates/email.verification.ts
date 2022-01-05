@@ -399,7 +399,7 @@ export const emailVerification = (user: any, url: string) => {
                 </tr><!-- end tr -->
                 <!-- 1 Column Text + Button : END -->
             </table>
-            <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+           <!-- <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
                 style="margin: auto;">
                 <tr>
                     <td valign="middle" class="bg_light footer email-section">
@@ -446,7 +446,7 @@ export const emailVerification = (user: any, url: string) => {
                                     </table>
                                 </td>
                             </tr>
-                        </table>
+                        </table> -->
                     </td>
                 </tr><!-- end: tr -->
                 <tr>
