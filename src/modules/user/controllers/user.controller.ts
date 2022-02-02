@@ -84,7 +84,7 @@ export class UserController {
     @Req() req: any,
   ) {
     try {
-      const path: string = '/api/users/' + file.filename + '/dp';
+      const path: string = '/users/' + file.filename + '/dp';
       const response = {
         path,
         message: 'Profile picture saved successfully',
