@@ -1,8 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import {
+  getRelations,
+  getSelections,
+} from '../../../core/helpers/get-fields.utility';
+import { getWhereConditions } from '../../../core/helpers/get-where-conditions.utility';
+import { resolveWhereJob } from '../../../core/helpers/resolvewhere';
 import { BaseService } from '../../../core/services/base.service';
 import { User } from '../../user/entities/user.entity';
-import { Repository } from 'typeorm';
 import { Job } from '../entities/job.entity';
 
 @Injectable()
@@ -111,5 +117,41 @@ export class JobService extends BaseService<Job> {
     const sql = `SELECT * FROM ${table} A WHERE A.JOBID=${job.id} AND A.USERID=${user.id}`;
     const data = await this.repository.manager.query(sql);
     return data;
+  }
+  async findAndCount(
+    fields: any,
+    filter: any,
+    size: number,
+    page: number,
+  ): Promise<[Job[], number]> {
+    const metaData = this.modelRepository.manager.connection.getMetadata(
+      this.Model,
+    );
+    let where = Object.assign(
+      {},
+      ...((
+        await resolveWhereJob(this.modelRepository, getWhereConditions(filter))
+      )['checks'] || []),
+    );
+    const categories: any[] = (
+      await resolveWhereJob(this.modelRepository, getWhereConditions(filter))
+    )['categories'];
+    if (categories && categories.length > 0) {
+      const ids: any[] = await this.modelRepository.manager.query(
+        `SELECT "jobId" FROM CATEGORIESJOB WHERE "jobcategoryId" IN(${categories
+          .map(({ id }) => id)
+          .join(',')})`,
+      );
+      where = { ...where, id: In(ids.map(({ jobId }) => jobId)) };
+    }
+    const relations = getRelations(fields, metaData);
+    const select = getSelections(fields, metaData);
+    return await this.modelRepository.findAndCount({
+      select,
+      relations,
+      where,
+      skip: page * size,
+      take: size,
+    });
   }
 }
